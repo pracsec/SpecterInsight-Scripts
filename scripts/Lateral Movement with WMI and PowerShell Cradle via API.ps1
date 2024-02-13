@@ -25,8 +25,6 @@ $Command = payload -Build $Build -Kind 'ps_command';
 #Execute command on remote system using WMI commandline executable
 if(![String]::IsNullOrEmpty($Username) -and $Password -ne $null) {
     #Run with explicit credentials
-    $Username = "administrator@lab.net"
-    $Password = "1qaz!QAZ"
     $SecurePassword = ConvertTo-SecureString -String $Password -AsPlainText -Force
     $Credential = New-Object -TypeName System.Management.Automation.PSCredential -ArgumentList $Username, $SecurePassword
 

